@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="noneDialog" class="com.bot.api.dialog.none.NoneBO" />
+    <bean id="orderDialog" class="com.bot.api.dialog.order.OrderBO" />
+    <bean id="exchangeDialog" class="com.bot.api.dialog.exchange.ExchangeBO" />
+
+    <bean id="dialogMapper" class="com.bot.api.dialog.DialogMapper">
+        <property name="dialogMap">
+            <map>
+                <entry key="None" value-ref="noneDialog"/>
+                <entry key="주문" value-ref="orderDialog"/>
+                <entry key="교환" value-ref="exchangeDialog"/>
+            </map>
+        </property>
+    </bean>
+</beans>
