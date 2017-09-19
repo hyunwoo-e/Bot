@@ -4,6 +4,7 @@ import com.bot.api.dialog.Dialogable;
 import com.bot.api.dialog.DialogDAO;
 import com.bot.api.model.dialog.Dialog;
 import com.bot.api.model.kakao.KakaoResponse;
+import com.bot.api.model.kakao.Message;
 import com.bot.api.model.luis.LuisResponse;
 import com.bot.api.dialog.order.OrderDAO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,11 @@ public class ExchangeBO implements Dialogable {
     private DialogDAO dialogDAO;
 
     public KakaoResponse recvLuisResponse(Dialog dialog, LuisResponse luisResponse) {
+        Message message;
+        message = new Message();
+        message.setText("교환");
+
         dialogDAO.updateUserDialog(dialog.getUserId(), "None", "None");
-        return KakaoResponse.valueOf("교환",null,null);
+        return KakaoResponse.valueOf(message,null);
     }
 }

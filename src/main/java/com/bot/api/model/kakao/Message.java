@@ -11,10 +11,10 @@ import java.io.Serializable;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
-@AllArgsConstructor(staticName = "valueOf")
-public class KakaoResponse implements Serializable {
+public class Message implements Serializable {
     private static final long serialVersionUID = 18572157081L;
 
-    private Message message;
-    private Keyboard keyboard;
+    private String text;
+    private Photo photo;
+    private MessageButton message_button;
 }
