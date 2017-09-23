@@ -18,7 +18,6 @@ import java.nio.charset.Charset;
 @Service
 public class DialogBO {
     private static final Logger log = LogManager.getRootLogger();
-
     @Autowired
     private DialogDAO dialogDAO;
 
@@ -32,16 +31,16 @@ public class DialogBO {
         //현재 다이얼로그 조회
         dialog = dialogDAO.selectUserDialog(kakaoRequest.getUser_key());
         if(dialog == null) {
-            dialogDAO.insertUserDialog(kakaoRequest.getUser_key(), "None", "None");
-            dialog = Dialog.valueOf(kakaoRequest.getUser_key(), "None", "None");
+            dialogDAO.insertUserDialog(kakaoRequest.getUser_key(), Dialog.defaultDialogId, Dialog.defaultDialogStatusCode);
+            dialog = Dialog.valueOf(kakaoRequest.getUser_key(), Dialog.defaultDialogId, Dialog.defaultDialogStatusCode);
         }
 
         //자연어 분석
         luisResponse = getLuisResponse(kakaoRequest);
 
-        //다이얼로그가 존재하지 않으면 다이얼로그 생성
-        if(dialog.getDialogId().equals("None")) {
-            dialogDAO.updateUserDialog(dialog.getUserId(), luisResponse.getTopScoringIntent().getIntent(), "None");
+        //다이얼로그가 존재하지 않을때만 다이얼로그 생성
+        if(dialog.getDialogId().equals(Dialog.defaultDialogId)) {
+            dialogDAO.updateUserDialog(dialog.getUserId(), luisResponse.getTopScoringIntent().getIntent(), Dialog.defaultDialogStatusCode);
             dialog.setDialogId(luisResponse.getTopScoringIntent().getIntent());
         }
 

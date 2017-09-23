@@ -7,9 +7,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DialogDAO {
 
-    int insertUserDialog(@Param("userId") String userId, @Param("dialogId") String dialogId, @Param("dialogStatus") String dialogStatus);
+    int insertUserDialog(@Param("userId") String userId, @Param("dialogId") String dialogId, @Param("dialogStatusCode") int dialogStatus);
 
-    int updateUserDialog(@Param("userId") String userId, @Param("dialogId") String dialogId, @Param("dialogStatus") String dialogStatus);
+    int updateUserDialog(@Param("userId") String userId, @Param("dialogId") String dialogId, @Param("dialogStatusCode") int dialogStatus);
 
     int deleteUserDialog(@Param("userId") String userId);
 
