@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bot.api.dialog.exchange.ExchangeDAO">
+    <insert id="insertUserExchange">
+        INSERT INTO tb_user_exchange (
+          user_id,
+          exchange_type,
+          exchange_product,
+          exchange_count,
+          is_trace,
+        )
+        VALUES (
+          #{userId},
+          NULL,
+          NULL,
+          NULL,
+          NULL
+        );
+    </insert>
+
+    <select id="selectUserExchange">
+        SELECT
+        exchange_type AS exchangeType,
+        exchange_product AS exchangeProduct,
+        exchange_count AS exchangeCount,
+        traceYn AS traceYn
+        FROM
+        tb_user_exchange
+        WHERE
+        user_id = #{userId}
+    </select>
+
+    <update id="updateUserExchange">
+      UPDATE tb_user_exchange
+      SET
+        <if test="exchangeProduct != null">
+            exchange_product = #{exchangeProduct},
+        </if>
+        <if test="exchangeType != null">
+            exchange_type = #{exchangeType},
+        </if>
+        <if test="isTrace != null">
+            is_trace = #{isTrace},
+        </if>
+        <if test="exchangeCount != null">
+            exchange_count = #{exchangeCount},
+        </if>
+        modify_ymdt = NOW()
+      WHERE user_id = #{userId}
+    </update>
+
+    <delete id="deleteUserExchange">
+        DELETE FROM tb_user_exchange
+        WHERE user_id = #{userId}
+    </delete>
+
+</mapper>

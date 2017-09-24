@@ -14,38 +14,40 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class DialogBO {
     private static final Logger log = LogManager.getRootLogger();
+
     @Autowired
-    private DialogDAO dialogDAO;
+    private UserMapper userMapper;
 
     @Autowired
     private DialogMapper dialogMapper;
+
+    @Autowired
+    private DialogDAO dialogDAO;
 
     public KakaoResponse recvMessage(KakaoRequest kakaoRequest) {
         Dialog dialog;
         LuisResponse luisResponse;
 
         //현재 다이얼로그 조회
-        dialog = dialogDAO.selectUserDialog(kakaoRequest.getUser_key());
-        if(dialog == null) {
-            dialogDAO.insertUserDialog(kakaoRequest.getUser_key(), Dialog.defaultDialogId, Dialog.defaultDialogStatusCode);
-            dialog = Dialog.valueOf(kakaoRequest.getUser_key(), Dialog.defaultDialogId, Dialog.defaultDialogStatusCode);
+        if(!userMapper.containsKey(kakaoRequest.getUser_key())) {
+            userMapper.put(kakaoRequest.getUser_key(), Dialog.valueOf(Dialog.defaultDialogId, Dialog.defaultDialogStatusCode));
         }
+        dialog = userMapper.get(kakaoRequest.getUser_key());
 
         //자연어 분석
         luisResponse = getLuisResponse(kakaoRequest);
-
-        //다이얼로그가 존재하지 않을때만 다이얼로그 생성
         if(dialog.getDialogId().equals(Dialog.defaultDialogId)) {
-            dialogDAO.updateUserDialog(dialog.getUserId(), luisResponse.getTopScoringIntent().getIntent(), Dialog.defaultDialogStatusCode);
             dialog.setDialogId(luisResponse.getTopScoringIntent().getIntent());
         }
 
         //인텐트별 엔티티 삽입 후 응답(null값 요청 / 최종 응답)
-        return dialogMapper.getDialog(dialog.getDialogId()).recvLuisResponse(dialog, luisResponse);
+        return dialogMapper.getDialog(dialog.getDialogId()).recvLuisResponse(kakaoRequest.getUser_key(), luisResponse);
     }
 
     public LuisResponse getLuisResponse(KakaoRequest kakaoRequest) {

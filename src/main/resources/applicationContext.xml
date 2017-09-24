@@ -32,7 +32,4 @@
     <bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
         <property name="transactionManager" ref="transactionManager" />
     </bean>
-
-    <!-- 다이얼로그 설정 파일 -->
-    <import resource="classpath:applicationContext-dialogs.xml" />
 </beans>

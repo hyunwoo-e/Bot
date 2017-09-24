@@ -11,7 +11,6 @@ import lombok.Data;
 public class Dialog {
     public static final String defaultDialogId = "None";
     public static final int defaultDialogStatusCode = 10000000;;
-    private String userId;
     private String dialogId;
     private int dialogStatusCode;
 }
