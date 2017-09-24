@@ -18,8 +18,8 @@ public class NoneBO implements Dialogable {
     public KakaoResponse recvLuisResponse(String userKey, LuisResponse luisResponse) {
         Dialog dialog = userMapper.get(userKey);
 
-        dialog.setDialogId(Dialog.defaultDialogId);
-        dialog.setDialogStatusCode(Dialog.defaultDialogStatusCode);
+        dialog.setDialogId(Dialog.none);
+        dialog.setDialogStatusCode(Dialog.none);
         userMapper.put(userKey, dialog);
 
         Message message;

@@ -36,14 +36,16 @@ public class DialogBO {
 
         //현재 다이얼로그 조회
         if(!userMapper.containsKey(kakaoRequest.getUser_key())) {
-            userMapper.put(kakaoRequest.getUser_key(), Dialog.valueOf(Dialog.defaultDialogId, Dialog.defaultDialogStatusCode));
+            userMapper.put(kakaoRequest.getUser_key(), Dialog.valueOf(Dialog.none,
+                    Dialog.none + ">" + Dialog.none));
         }
         dialog = userMapper.get(kakaoRequest.getUser_key());
 
         //자연어 분석
         luisResponse = getLuisResponse(kakaoRequest);
-        if(dialog.getDialogId().equals(Dialog.defaultDialogId)) {
+        if(dialog.getDialogId().equals(Dialog.none)) {
             dialog.setDialogId(luisResponse.getTopScoringIntent().getIntent());
+            dialog.setDialogStatusCode(dialog.getDialogId() + ">" + Dialog.none);
         }
 
         //인텐트별 엔티티 삽입 후 응답(null값 요청 / 최종 응답)

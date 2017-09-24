@@ -9,8 +9,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor(staticName = "valueOf")
 public class Dialog {
-    public static final String defaultDialogId = "None";
-    public static final int defaultDialogStatusCode = 10000000;;
+    public static final String none = "None";
     private String dialogId;
-    private int dialogStatusCode;
+    private String dialogStatusCode;
 }
