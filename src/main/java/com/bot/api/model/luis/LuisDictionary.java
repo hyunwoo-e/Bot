@@ -10,23 +10,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class IntentMapper {
-    private Map<String, Conversable> intentMap;
-
-    @Autowired
-    private NoneBO noneBO;
-
-    @Autowired
-    private PartyBO partyBO;
+public class LuisDictionary {
+    private Map<String, String> dictionary;
 
     @PostConstruct
     public void init(){
-        intentMap = new HashMap<String, Conversable>();
-        intentMap.put("None", noneBO);
-        intentMap.put("프로필조회", partyBO);
+        dictionary = new HashMap<String, String>();
+        dictionary.put("연락처", "telephone");
+        dictionary.put("주소", "address");
+        dictionary.put("메일", "email");
     }
 
-    public Conversable getIntent(String key) {
-        return intentMap.get(key);
+    public String get(String key) {
+        return dictionary.get(key);
     }
 }
