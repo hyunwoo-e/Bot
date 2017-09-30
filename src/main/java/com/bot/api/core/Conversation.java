@@ -18,5 +18,5 @@ public class Conversation {
     public static final String none = "None";
     private String intent;
     private String dialog;
-    private HashMap<String, Resolution> entityMap;
+    private HashMap<String, List<String>> entityMap;
 }

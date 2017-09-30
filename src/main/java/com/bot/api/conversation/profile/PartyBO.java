@@ -7,12 +7,9 @@ import com.bot.api.core.Conversation;
 import com.bot.api.model.kakao.KakaoResponse;
 import com.bot.api.model.kakao.Keyboard;
 import com.bot.api.model.kakao.Message;
-import com.bot.api.model.luis.Entity;
 import com.bot.api.model.luis.LuisResponse;
-import com.bot.api.model.luis.Resolution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.HashMap;
 
 @Service
@@ -28,24 +25,7 @@ public class PartyBO implements Conversable {
     private LuisDictionary luisDictionary;
 
     public KakaoResponse recvLuisResponse(String userKey, LuisResponse luisResponse) {
-        setEntity(userKey, luisResponse);
         return getKakaoResponse(userKey, luisResponse);
-    }
-
-    private void setEntity(String userKey, LuisResponse luisResponse) {
-        if(userMapper.get(userKey).getEntityMap() == null) {
-            userMapper.get(userKey).setEntityMap(new HashMap<String, Resolution>());
-        }
-
-        for(Entity entity : luisResponse.getEntities()) {
-            if(!userMapper.get(userKey).getEntityMap().containsKey(entity.getType())) {
-                userMapper.get(userKey).getEntityMap().put(entity.getType(), entity.getResolution());
-            } else {
-                if(!userMapper.get(userKey).getEntityMap().get(entity.getType()).getValues().contains(entity.getResolution().getValues().get(0))) {
-                    userMapper.get(userKey).getEntityMap().get(entity.getType()).getValues().add(entity.getResolution().getValues().get(0));
-                }
-            }
-        }
     }
 
     private KakaoResponse getKakaoResponse(String userKey, LuisResponse luisResponse) {
@@ -55,15 +35,15 @@ public class PartyBO implements Conversable {
 
         if(!userMapper.get(userKey).getEntityMap().containsKey("관계자")) {
             userMapper.get(userKey).setDialog("관계자 입력요청");
-            text = "아래의 관계자를 안내드릴 수 있습니다.";
+            text = "어떤 관계자의 정보를 안내드릴까요?";
         } else {
-            for(String partyName : userMapper.get(userKey).getEntityMap().get("관계자").getValues()) {
+            for(String partyName : userMapper.get(userKey).getEntityMap().get("관계자")) {
                 HashMap <String, String> map = partyDAO.selectPartyByName(partyName);
                 if(!userMapper.get(userKey).getEntityMap().containsKey("프로필")) {
                     //모두
                 } else {
                     text += map.get("partyName") + " " + map.get("partyType") + "의";
-                    for(String info : userMapper.get(userKey).getEntityMap().get("프로필").getValues()) {
+                    for(String info : userMapper.get(userKey).getEntityMap().get("프로필")) {
                         text += " " + info + "은(는) " + map.get(luisDictionary.get(info));
                     }
                     text += " 입니다.";

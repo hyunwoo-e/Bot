@@ -7,6 +7,7 @@ import com.bot.api.model.kakao.KakaoRequest;
 import com.bot.api.model.kakao.KakaoResponse;
 import com.bot.api.model.kakao.Keyboard;
 import com.bot.api.model.kakao.Message;
+import com.bot.api.model.luis.Entity;
 import com.bot.api.model.luis.LuisResponse;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -18,6 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 @Service
 public class KakaoBO {
@@ -67,6 +71,7 @@ public class KakaoBO {
         userMapper.put(kakaoRequest.getUser_key(), conversation);
 
         //인텐트별 엔티티 삽입 후 응답(null값 요청 / 최종 응답)
+        setEntity(kakaoRequest.getUser_key(), luisResponse);
         return intentMapper.getIntent(conversation.getIntent()).recvLuisResponse(kakaoRequest.getUser_key(), luisResponse);
     }
 
@@ -85,5 +90,25 @@ public class KakaoBO {
 
         httpEntity = new HttpEntity<String>("\"" + kakaoRequest.getContent() + "\"", headers);
         return new RestTemplate().postForObject(url + appId, httpEntity, LuisResponse.class);
+    }
+
+    private void setEntity(String userKey, LuisResponse luisResponse) {
+        if(userMapper.get(userKey).getEntityMap() == null) {
+            userMapper.get(userKey).setEntityMap(new HashMap<String, List<String>>());
+        }
+
+        for(Entity entity : luisResponse.getEntities()) {
+            if(!userMapper.get(userKey).getEntityMap().containsKey(entity.getType())) {
+                userMapper.get(userKey).getEntityMap().put(entity.getType(), new ArrayList<String>());
+            }
+
+            if(entity.getResolution() == null) {
+                userMapper.get(userKey).getEntityMap().get(entity.getType()).add(entity.getEntity());
+            } else {
+                if(!userMapper.get(userKey).getEntityMap().get(entity.getType()).contains(entity.getResolution().getValues().get(0))) {
+                    userMapper.get(userKey).getEntityMap().get(entity.getType()).add(entity.getResolution().getValues().get(0));
+                }
+            }
+        }
     }
 }
