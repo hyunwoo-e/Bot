@@ -1,6 +1,5 @@
 package com.bot.api.kakao;
 
-import com.bot.api.dialog.DialogBO;
 import com.bot.api.model.kakao.KakaoRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,9 +17,6 @@ public class KakaoController {
     @Autowired
     private KakaoBO kakaoBO;
 
-    @Autowired
-    private DialogBO dialogBO;
-
     /*
     * 카카오 자동응답 API 채팅룸 입장
     * */
@@ -36,9 +32,12 @@ public class KakaoController {
     @RequestMapping(value="/message", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity recvMessage(@RequestBody KakaoRequest kakaoRequest) {
-        return new ResponseEntity(dialogBO.recvMessage(kakaoRequest), HttpStatus.OK);
+        return new ResponseEntity(kakaoBO.recvMessage(kakaoRequest), HttpStatus.OK);
     }
 
+    /*
+    * 카카오 자동응답 API 채팅룸 퇴장
+    * */
     @RequestMapping(value="/chat_room/{userKey}", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity exitRoom(@PathVariable String userKey) {
@@ -50,8 +49,8 @@ public class KakaoController {
     * */
     @RequestMapping(value="/friend", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity addFriend(KakaoRequest request) {
-        return new ResponseEntity(HttpStatus.OK);
+    public ResponseEntity addFriend(KakaoRequest kakaoRequest) {
+        return new ResponseEntity(kakaoBO.addFriends(kakaoRequest), HttpStatus.OK);
     }
 
     /*

@@ -1,24 +1,25 @@
-package com.bot.api.dialog;
+package com.bot.api.core;
 
-import com.bot.api.model.dialog.Dialog;
 import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 @Component
 public class UserMapper {
-    public HashMap<String, Dialog> userMap;
+    public HashMap<String, Conversation> userMap;
 
     @PostConstruct
     public void init(){
-        userMap = new HashMap<String, Dialog>();
+        userMap = new HashMap<String, Conversation>();
     }
 
-    public void put(String userKey, Dialog dialog) {
-        userMap.put(userKey, dialog);
+    public void put(String userKey, Conversation conversation) {
+        userMap.put(userKey, conversation);
     }
 
-    public Dialog get(String userKey) {
+    public Conversation get(String userKey) {
         return userMap.get(userKey);
     }
 
