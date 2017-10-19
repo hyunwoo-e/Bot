@@ -9,6 +9,7 @@ import com.bot.api.model.kakao.Keyboard;
 import com.bot.api.model.kakao.Message;
 import com.bot.api.model.luis.Entity;
 import com.bot.api.model.luis.LUIS;
+import com.bot.api.model.luis.Value;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,12 +89,12 @@ public class KakaoBO {
 
     private void setEntities(String userKey, LUIS luis) {
         if(userMapper.get(userKey).getEntityMap() == null) {
-            userMapper.get(userKey).setEntityMap(new HashMap<String, ArrayList<String>>());
+            userMapper.get(userKey).setEntityMap(new HashMap<String, ArrayList<Value>>());
         }
 
         for(Entity entity : luis.getEntities()) {
             if(userMapper.get(userKey).getEntityMap().get(entity.getEntity()) == null) {
-                userMapper.get(userKey).getEntityMap().put(entity.getEntity(), new ArrayList<String>());
+                userMapper.get(userKey).getEntityMap().put(entity.getEntity(), new ArrayList<Value>());
             }
             for(int i = 0 ; i < entity.getValues().size() ; i++) {
                 userMapper.get(userKey).getEntityMap().get(entity.getEntity()).add(entity.getValues().get(i));

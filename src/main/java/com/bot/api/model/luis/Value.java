@@ -13,8 +13,9 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @AllArgsConstructor(staticName = "valueOf")
-public class Entity implements Serializable {
-    private static final long serialVersionUID = -117958171231591L;
-    private String entity;
-    private List<Value> values;
+public class Value implements Serializable {
+    private static final long serialVersionUID = -910198101111L;
+    private String value;
+    private int start;
+    private int end;
 }

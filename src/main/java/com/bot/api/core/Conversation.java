@@ -1,5 +1,6 @@
 package com.bot.api.core;
 
+import com.bot.api.model.luis.Value;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -15,5 +16,5 @@ import java.util.List;
 public class Conversation {
     private String intent;
     private String dialog;
-    private HashMap<String, ArrayList<String>> entityMap;
+    private HashMap<String, ArrayList<Value>> entityMap;
 }

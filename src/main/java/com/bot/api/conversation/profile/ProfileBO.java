@@ -9,6 +9,7 @@ import com.bot.api.model.kakao.Keyboard;
 import com.bot.api.model.kakao.Message;
 import com.bot.api.model.luis.Entity;
 import com.bot.api.model.luis.LUIS;
+import com.bot.api.model.luis.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.HashMap;
@@ -34,7 +35,8 @@ public class ProfileBO implements Conversable {
             userMapper.get(userKey).setDialog("관계자 입력요청");
             text = "어떤 관계자의 정보를 안내드릴까요?";
         } else {
-            for(String profileName : userMapper.get(userKey).getEntityMap().get("관계자")) {
+            for(Value value : userMapper.get(userKey).getEntityMap().get("관계자")) {
+                String profileName = value.getValue();
                 text = "관계자 정보";
                 /*
                 HashMap <String, String> map = profileDAO.selectProfileByName(profileName);

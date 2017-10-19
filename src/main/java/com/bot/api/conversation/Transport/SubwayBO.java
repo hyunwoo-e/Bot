@@ -9,6 +9,7 @@ import com.bot.api.model.kakao.KakaoResponse;
 import com.bot.api.model.kakao.Keyboard;
 import com.bot.api.model.kakao.Message;
 import com.bot.api.model.luis.LUIS;
+import com.bot.api.model.luis.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,9 @@ public class SubwayBO implements Conversable {
         Keyboard keyboard = new Keyboard();
 
         text = "지하철 조회";
+        for(Value value : userMapper.get(userKey).getEntityMap().get("지하철역")) {
+            text += " " + value.getValue();
+        }
         message.setText(text);
         return KakaoResponse.valueOf(message, keyboard);
     }
