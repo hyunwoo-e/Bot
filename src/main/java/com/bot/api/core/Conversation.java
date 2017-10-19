@@ -1,12 +1,10 @@
 package com.bot.api.core;
 
-import com.bot.api.model.luis.Entity;
-import com.bot.api.model.luis.Resolution;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -15,8 +13,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor(staticName = "valueOf")
 public class Conversation {
-    public static final String none = "None";
     private String intent;
     private String dialog;
-    private HashMap<String, List<String>> entityMap;
+    private HashMap<String, ArrayList<String>> entityMap;
 }

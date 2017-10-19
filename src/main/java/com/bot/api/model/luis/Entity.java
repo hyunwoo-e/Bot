@@ -12,12 +12,9 @@ import java.util.List;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
+@AllArgsConstructor(staticName = "valueOf")
 public class Entity implements Serializable {
     private static final long serialVersionUID = -117958171231591L;
-
     private String entity;
-    private String type;
-    private int startIndex;
-    private int endIndex;
-    private Resolution resolution;
+    private List<String> values;
 }

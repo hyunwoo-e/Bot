@@ -13,11 +13,9 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @AllArgsConstructor(staticName = "valueOf")
-public class LuisResponse implements Serializable {
+public class LUIS implements Serializable {
     private static final long serialVersionUID = -11795817591L;
-
     private String query;
-    private Intent topScoringIntent;
-    private List<Intent> intents;
+    private Intent intent;
     private List<Entity> entities;
 }

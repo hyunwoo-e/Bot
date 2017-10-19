@@ -1,6 +1,8 @@
-package com.bot.api.conversation.none;
+package com.bot.api.conversation.Transport;
 
+import com.bot.api.conversation.profile.ProfileDAO;
 import com.bot.api.core.Conversable;
+import com.bot.api.core.Conversation;
 import com.bot.api.core.LuisDictionary;
 import com.bot.api.core.UserMapper;
 import com.bot.api.model.kakao.KakaoResponse;
@@ -11,10 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class NoneBO implements Conversable {
+public class SubwayBO implements Conversable {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private ProfileDAO profileDAO;
 
     @Autowired
     private LuisDictionary luisDictionary;
@@ -24,6 +29,7 @@ public class NoneBO implements Conversable {
         Message message = new Message();
         Keyboard keyboard = new Keyboard();
 
+        text = "지하철 조회";
         message.setText(text);
         return KakaoResponse.valueOf(message, keyboard);
     }

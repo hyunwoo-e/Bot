@@ -14,7 +14,6 @@ import java.io.Serializable;
 @AllArgsConstructor(staticName = "valueOf")
 public class Intent implements Serializable {
     private static final long serialVersionUID = -11231591L;
-
     private String intent;
     private float score;
 }

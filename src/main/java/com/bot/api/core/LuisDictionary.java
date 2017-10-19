@@ -1,8 +1,5 @@
 package com.bot.api.core;
 
-import com.bot.api.conversation.profile.NoneBO;
-import com.bot.api.conversation.profile.PartyBO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
