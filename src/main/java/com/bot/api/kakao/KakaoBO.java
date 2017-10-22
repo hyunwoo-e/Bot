@@ -42,10 +42,8 @@ public class KakaoBO {
         return keyboard;
     }
 
-    public KakaoResponse addFriends(KakaoRequest kakaoRequest) {
-        Message message = new Message();
-        message.setText("안녕하세요! 저는 건국대학교 봇입니다. 무엇을 도와드릴까요?");
-        return KakaoResponse.valueOf(message, null);
+    public void addFriends(KakaoRequest kakaoRequest) {
+
     }
 
     public KakaoResponse recvMessage(KakaoRequest kakaoRequest) {

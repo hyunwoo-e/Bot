@@ -50,7 +50,7 @@ public class KakaoController {
     @RequestMapping(value="/friend", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity addFriend(KakaoRequest kakaoRequest) {
-        return new ResponseEntity(kakaoBO.addFriends(kakaoRequest), HttpStatus.OK);
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     /*
