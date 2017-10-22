@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bot.api.conversation.member.MemberDAO">
+    <select id="selectMembers" resultType="com.bot.api.model.common.Member">
+        SELECT
+        member_no AS memberNo,
+  	    member_department AS memberDepartment,
+        member_type AS memberType,
+	    member_name AS memberName,
+	    member_address AS memberAddress,
+	    member_room_tel AS memberRoomTel,
+	    member_mobile_tel AS memberMobileTel,
+	    member_email AS memberEmail,
+	    regist_ymdt AS registYmdt,
+	    modify_ymdt AS modifyYmdt
+        FROM
+        tb_member
+        WHERE
+        member_name IN
+        (
+            <foreach collection="memberNames" item="name" separator="," >
+                ( #{name} )
+            </foreach>
+        )
+        <if test="memberDepartments != null">
+            AND member_department IN
+            (
+            <foreach collection="memberDepartments" item="department" separator="," >
+                ( #{department} )
+            </foreach>
+            )
+        </if>
+
+    </select>
+</mapper>

@@ -65,6 +65,7 @@ public class KakaoController {
     //TODO: GlobalExceptionHandler 적용
     @ExceptionHandler(Exception.class)
     public void globalExceptionHandler(Exception e){
+        e.printStackTrace();
         System.out.println("[카카오 요청 에러]");
         return;
     }

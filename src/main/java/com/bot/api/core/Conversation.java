@@ -15,6 +15,8 @@ import java.util.List;
 @AllArgsConstructor(staticName = "valueOf")
 public class Conversation {
     private String intent;
-    private String dialog;
     private HashMap<String, ArrayList<Value>> entityMap;
+    private String dialog;
+    private Boolean isForceInto;
+    private Integer tryCount;
 }
