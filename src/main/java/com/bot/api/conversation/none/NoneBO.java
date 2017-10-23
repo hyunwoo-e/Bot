@@ -24,6 +24,6 @@ public class NoneBO implements Conversable {
                 "죄송합니다. 잘 알아듣지 못했습니다. 저는 다음과 같은 서비스를 제공해드릴 수 있습니다.\n";
 
         message.setText(text);
-        return KakaoResponse.valueOf(message, keyboard);
+        return KakaoResponse.valueOf(message, null);
     }
 }

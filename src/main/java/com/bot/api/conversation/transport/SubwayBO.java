@@ -39,6 +39,6 @@ public class SubwayBO implements Conversable {
         userMapper.put(userKey, Conversation.valueOf("None",null,"None", false,0));
 
         message.setText(text);
-        return KakaoResponse.valueOf(message, keyboard);
+        return KakaoResponse.valueOf(message, null);
     }
 }

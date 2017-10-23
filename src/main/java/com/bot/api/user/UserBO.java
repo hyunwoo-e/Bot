@@ -14,10 +14,6 @@ public class UserBO {
     @Autowired
     private UserDAO userDAO;
 
-    public void insertUser() {
-
-    }
-
     public User selectUser(String userKey) {
         User user = new User();
         return userDAO.selectUser(userKey);

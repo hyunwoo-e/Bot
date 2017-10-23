@@ -79,6 +79,6 @@ public class MemberBO implements Conversable {
         }
 
         message.setText(text);
-        return KakaoResponse.valueOf(message, keyboard);
+        return KakaoResponse.valueOf(message, null);
     }
 }

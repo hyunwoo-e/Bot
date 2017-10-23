@@ -53,7 +53,7 @@ public class KakaoBO {
         if(!userMapper.containsKey(kakaoRequest.getUser_key())) {
             //학생 인증
             if(userBO.selectUser(kakaoRequest.getUser_key()) == null) {
-                return makeJoinMessage();
+                return makeJoinMessage(kakaoRequest.getUser_key());
             }
             userMapper.put(kakaoRequest.getUser_key(), Conversation.valueOf("None",null,"None", false,0));
         }
@@ -108,11 +108,11 @@ public class KakaoBO {
         }
     }
 
-    public KakaoResponse makeJoinMessage() {
+    public KakaoResponse makeJoinMessage(String userKey) {
         Message message = new Message();
         MessageButton messageButton = new MessageButton();
         messageButton.setLabel("등록하기");
-        messageButton.setUrl("http://");
+        messageButton.setUrl("http://125.129.148.199:8080/konkuk/user?userKey=" + userKey);
         message.setMessage_button(messageButton);
         message.setText("건국대학교 학생 인증이 필요합니다. 아래 링크를 통해 인증해 주세요!");
         return KakaoResponse.valueOf(message, null);
