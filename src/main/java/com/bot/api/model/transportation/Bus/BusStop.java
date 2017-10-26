@@ -13,10 +13,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class BusStop {
 
     @XmlElement(name = "stId")
-    String stId;
+    private String stId;
 
     @XmlElement(name = "stNm")
-    String stNm;
+    private String stNm;
 
 
 }

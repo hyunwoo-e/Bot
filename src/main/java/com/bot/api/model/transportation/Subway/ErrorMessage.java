@@ -9,10 +9,10 @@ import lombok.Data;
 @Data
 @AllArgsConstructor(staticName = "valueOf")
 public class ErrorMessage {
-    String status;
-    String code;
-    String message;
-    String link;
-    String developerMessage;
-    String total;
+    private String status;
+    private String code;
+    private String message;
+    private String link;
+    private String developerMessage;
+    private String total;
 }

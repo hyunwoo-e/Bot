@@ -9,33 +9,33 @@ import lombok.Data;
 @Data
 @AllArgsConstructor(staticName = "valueOf")
 public class ResultInfo {
-    String beginRow;
-    String endRow;
-    String curPage;
-    String pageRow;
-    String totalCount;
-    String rowNum;
-    String selectedCount;
-    String subwayId;
-    String subwayNm;
-    String updnLine;
-    String trainLineNm;
-    String subwayHeading;
-    String statnFid;
-    String statnTid;
-    String statnNm;
-    String trainCo;
-    String ordkey;
-    String subwayList;
-    String statnList;
-    String btrainSttus;
-    String barvlDt;
-    String btrainNo;
-    String bstatnId;
-    String recptnDt;
-    String arvlMsg2;
-    String arvlMsg3;
-    String arvlCd;
+    private String beginRow;
+    private String endRow;
+    private String curPage;
+    private String pageRow;
+    private String totalCount;
+    private String rowNum;
+    private String selectedCount;
+    private String subwayId;
+    private String subwayNm;
+    private String updnLine;
+    private String trainLineNm;
+    private String subwayHeading;
+    private String statnFid;
+    private String statnTid;
+    private String statnNm;
+    private String trainCo;
+    private String ordkey;
+    private String subwayList;
+    private String statnList;
+    private String btrainSttus;
+    private String barvlDt;
+    private String btrainNo;
+    private String bstatnId;
+    private String recptnDt;
+    private String arvlMsg2;
+    private String arvlMsg3;
+    private String arvlCd;
 
 
 }

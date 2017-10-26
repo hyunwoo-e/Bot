@@ -11,6 +11,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor(staticName = "valueOf")
 public class RealtimeArrivalList {
-    List<ResultInfo> resultInfos;
+    private List<ResultInfo> resultInfos;
 
 }

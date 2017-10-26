@@ -8,6 +8,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor(staticName = "valueOf")
 public class Subway {
-    ErrorMessage errorMessage;
-    RealtimeArrivalList realtimeArrivalList;
+    private ErrorMessage errorMessage;
+    private RealtimeArrivalList realtimeArrivalList;
 }

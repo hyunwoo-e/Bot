@@ -6,7 +6,7 @@ import com.bot.api.model.kakao.KakaoResponse;
 import com.bot.api.model.kakao.Keyboard;
 import com.bot.api.model.kakao.Message;
 import com.bot.api.model.luis.LUIS;
-import com.bot.api.model.transportation.Bus.Bus;
+import com.bot.api.model.transportation.Bus.BusArrival;
 import com.bot.api.model.transportation.Bus.BusStop;
 import com.bot.api.model.transportation.Subway.Subway;
 import jdk.nashorn.internal.parser.JSONParser;
@@ -50,8 +50,8 @@ public class BusBO implements Conversable{
 
     }
 
-    public BusStop getInfo(String station){
-        RestTemplate restTemplate;
+    public BusArrival getInfo(String station){
+        RestTemplate restTemplate = new RestTemplate();
         HttpHeaders httpHeaders;
         HttpEntity<String> httpEntity;
 
@@ -61,11 +61,22 @@ public class BusBO implements Conversable{
         String url_bus= "http://ws.bus.go.kr/api/rest/arrive/getLowArrInfoByStId?serviceKey=ihXrHl%2F6vXM4XArXesQyaEYv3SiIEYJwW9bevTFoVdZ0ZNIGRVAMU%2FN2G9kHohYLUgakPcXnWI6knmQcul1u7Q%3D%3D&stId=";
         String key = "ihXrHl%2F6vXM4XArXesQyaEYv3SiIEYJwW9bevTFoVdZ0ZNIGRVAMU%2FN2G9kHohYLUgakPcXnWI6knmQcul1u7Q%3D%3D";
 
-        httpHeaders.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-        httpEntity = new HttpEntity<String>(null, httpHeaders);
 
-        return new RestTemplate().postForObject(busStop, httpEntity ,Bus.class);
+        BusArrival busArrival = restTemplate.getForObject(url_bus, BusArrival.class);
+      //  httpHeaders.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+      //  httpEntity = new HttpEntity<String>(null, httpHeaders);
+
+        return busArrival;
     }
+
+    public BusStop getBusStop(String station){
+
+        String url_bus="";
+        String key = "";
+
+
+
+        return;
 
 
 

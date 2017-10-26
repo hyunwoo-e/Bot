@@ -18,7 +18,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
@@ -34,7 +33,7 @@ public class SubwayBO implements Conversable {
         String text = "";
         Message message = new Message();
   //      Keyboard keyboard = new Keyboard();
-   //   Subway subwayMap;
+        Subway subwayMap;
      //   RealtimeArrivalList realtimeArrivalList;
         ArrayList<Value> station;
         ArrayList<Value> subwayId;
@@ -120,15 +119,17 @@ public class SubwayBO implements Conversable {
         String key = "526f4f714e786b613730566c676145";
         String url_subway= null;
         try {
-            url_subway = "http://swopenapi.seoul.go.kr/api/subway/526f4f714e786b613730566c676145/json/realtimeStationArrival/1/7/"+ URLEncoder.encode(station,"utf-8");
+            url_subway = "http://swopenapi.seoul.go.kr/api/subway/526f4f714e786b613730566c676145/json/realtimeStationArrival/1/4/"+ URLEncoder.encode(station,"utf-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-
 //        httpHeaders.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 //        httpEntity = new HttpEntity<String>(station, httpHeaders);
 
-        return new RestTemplate().getForObject(url_subway, Subway.class);
+        restTemplate = new RestTemplate();
+        Subway subway = restTemplate.getForObject(url_subway, Subway.class);
+
+        return subway;
     }
 
     //지하철 초 -> 포맷 변경
