@@ -1,10 +1,12 @@
 package com.bot.api.core;
 
+import com.bot.api.conversation.etcData.LinkBO;
 import com.bot.api.conversation.none.NoneBO;
 import com.bot.api.conversation.member.MemberBO;
 import com.bot.api.conversation.transport.SubwayBO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
@@ -22,6 +24,9 @@ public class IntentMapper {
 
     @Autowired
     private SubwayBO subwayBO;
+
+    @Autowired
+    private LinkBO linkBO;
 
     @PostConstruct
     public void init(){
