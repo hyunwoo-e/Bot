@@ -1,6 +1,7 @@
 package com.bot.api.conversation.none;
 
 import com.bot.api.core.Conversable;
+import com.bot.api.core.Conversation;
 import com.bot.api.core.UserMapper;
 import com.bot.api.model.kakao.KakaoResponse;
 import com.bot.api.model.kakao.Keyboard;
@@ -24,6 +25,7 @@ public class NoneBO implements Conversable {
                 "죄송합니다. 잘 알아듣지 못했습니다. 저는 다음과 같은 서비스를 제공해드릴 수 있습니다.\n";
 
         message.setText(text);
+        userMapper.put(userKey, Conversation.valueOf("None",null,"None", false,0));
         return KakaoResponse.valueOf(message, null);
     }
 }

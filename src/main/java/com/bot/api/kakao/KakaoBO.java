@@ -52,9 +52,9 @@ public class KakaoBO {
         //현재 다이얼로그가 없을 경우 다이얼로그 생성
         if(!userMapper.containsKey(kakaoRequest.getUser_key())) {
             //학생 인증
-            if(userBO.selectUser(kakaoRequest.getUser_key()) == null) {
-                return makeJoinMessage(kakaoRequest.getUser_key());
-            }
+            //if(userBO.selectUser(kakaoRequest.getUser_key()) == null) {
+                //return makeJoinMessage(kakaoRequest.getUser_key());
+            //}
             userMapper.put(kakaoRequest.getUser_key(), Conversation.valueOf("None",null,"None", false,0));
         }
 
