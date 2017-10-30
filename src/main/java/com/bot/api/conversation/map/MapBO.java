@@ -35,8 +35,9 @@ public class MapBO extends Conversable {
         slots.put("장소", "조회하실 장소를 말씀해주세요.");
 
         // NULL 엔티티 요청
-        if((message = super.findNullEntity(userKey,slots)) != null)
-            return KakaoResponse.valueOf(message, null);
+        Message entityMessage;
+        if((entityMessage = super.findNullEntity(userKey,slots)) != null)
+            return KakaoResponse.valueOf(entityMessage, null);
 
         // 지도 조회
         MessageButton messageButton = new MessageButton();

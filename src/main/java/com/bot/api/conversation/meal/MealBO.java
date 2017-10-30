@@ -5,6 +5,7 @@ import com.bot.api.core.Conversable;
 import com.bot.api.core.Conversation;
 import com.bot.api.core.UserMapper;
 import com.bot.api.model.common.Meal;
+import com.bot.api.model.common.Schedule;
 import com.bot.api.model.kakao.KakaoResponse;
 import com.bot.api.model.kakao.Keyboard;
 import com.bot.api.model.kakao.Message;
@@ -12,9 +13,8 @@ import com.bot.api.model.kakao.MessageButton;
 import com.bot.api.model.luis.LUIS;
 import com.bot.api.model.luis.Value;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -58,7 +58,6 @@ public class MealBO extends Conversable {
     private String selectMeals(String userKey, HashSet<String> locationSet) {
         HttpHeaders headers = new HttpHeaders();;
         HttpEntity<String> httpEntity = new HttpEntity<String>(headers);
-        Meal[] meals;
         String text = "";
 
         HashSet<String> dateSet = new HashSet<String>();
@@ -69,7 +68,13 @@ public class MealBO extends Conversable {
         }
 
         if(locationSet.contains("학생회관")) {
-            meals = new RestTemplate().postForObject("http://"+ Common.konkuk_server_ip+":"+Common.konkuk_server_port+"/konkuk/api/meal.json?REST_NUM=3", httpEntity, Meal[].class);
+            //Meal[] meals = new RestTemplate().getForObject("http://"+ Common.konkuk_server_ip+":"+Common.konkuk_server_port+"/konkuk/api/meal.json?REST_NUM=3", Meal[].class);
+            ResponseEntity<List<Meal>> responseEntity = new RestTemplate().exchange("http://"+ Common.konkuk_server_ip+":"+Common.konkuk_server_port+"/konkuk/api/meal.json?REST_NUM=3",
+                    HttpMethod.GET, null, new ParameterizedTypeReference<List<Meal>>() {
+                    });
+            List<Meal> meals = responseEntity.getBody();
+
+
             text += "학생회관의 ";
             if(dateSet.contains("내일")) {
                 text += "내일식단은 ";
@@ -82,7 +87,12 @@ public class MealBO extends Conversable {
         }
 
         if(locationSet.contains("도서관")) {
-            meals = new RestTemplate().postForObject("http://"+ Common.konkuk_server_ip+":"+Common.konkuk_server_port+"/konkuk/api/meal.json?REST_NUM=2", httpEntity, Meal[].class);
+            //Meal[] meals = new RestTemplate().getForObject("http://"+ Common.konkuk_server_ip+":"+Common.konkuk_server_port+"/konkuk/api/meal.json?REST_NUM=2", Meal[].class);
+            ResponseEntity<List<Meal>> responseEntity = new RestTemplate().exchange("http://"+ Common.konkuk_server_ip+":"+Common.konkuk_server_port+"/konkuk/api/meal.json?REST_NUM=3",
+                    HttpMethod.GET, null, new ParameterizedTypeReference<List<Meal>>() {
+                    });
+            List<Meal> meals = responseEntity.getBody();
+
             text += "상허도서기념관의 ";
             if(dateSet.contains("내일")) {
                 text += "내일식단은 ";
@@ -98,7 +108,7 @@ public class MealBO extends Conversable {
         return text;
     }
 
-    private String selectTodayMeals(Meal[] meals) {
+    private String selectTodayMeals(List<Meal> meals) {
         Date date = new Date();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
@@ -110,19 +120,22 @@ public class MealBO extends Conversable {
         int i = 0;
         for(Meal meal : meals) {
             if(meal.getSALES_DT().equals(simpleDateFormat.format(date))) {
-                text += meal.getFOOD_NAME().replaceFirst("\r\n",",") + "(" + meal.getPRICE() + ")\n";
+                if(meal.getFOOD_NAME() != null)
+                    text += meal.getFOOD_NAME().replaceFirst("\r\n",",");
+                if(meal.getPRICE() != null) text += "(" + meal.getPRICE() + ")";
+                text += "\n";
                 i++;
             }
         }
 
         if(i == 0) {
-            text = "없습니다.\n";
+            text = "오늘은 식단이 없습니다.\n";
         }
 
         return text;
     }
 
-    private String selectTomorrowMeals(Meal[] meals) {
+    private String selectTomorrowMeals(List<Meal> meals) {
         Date date = new Date();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyymmdd");
 
@@ -130,13 +143,16 @@ public class MealBO extends Conversable {
         int i = 0;
         for(Meal meal : meals) {
             if(meal.getSALES_DT().equals(simpleDateFormat.format(date))) {
-                text += meal.getFOOD_NAME().replaceFirst("\r\n",",") + "(" + meal.getPRICE() + ")\n";
+                if(meal.getFOOD_NAME() != null)
+                    text += meal.getFOOD_NAME().replaceFirst("\r\n",",");
+                if(meal.getPRICE() != null) text += "(" + meal.getPRICE() + ")";
+                text += "\n";
                 i++;
             }
         }
 
         if(i == 0) {
-            text = "없습니다.\n";
+            text = "내일은 식단이 없습니다.\n";
         }
 
         return text;

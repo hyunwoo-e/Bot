@@ -6,5 +6,5 @@ import lombok.Data;
 public class Schedule {
     private String DAY_SCH;
     private String MON_SCH;
-    private String BODY_PREIVIEW;
+    private String BODY_PREVIEW;
 }

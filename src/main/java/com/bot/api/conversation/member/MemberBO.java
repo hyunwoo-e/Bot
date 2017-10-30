@@ -37,8 +37,9 @@ public class MemberBO extends Conversable {
         slots.put("관계자", "조회하실 대상을 말씀해주세요.");
 
         // NULL 엔티티 요청
-        if((message = super.findNullEntity(userKey,slots)) != null)
-            return KakaoResponse.valueOf(message, null);
+        Message entityMessage;
+        if((entityMessage = super.findNullEntity(userKey,slots)) != null)
+            return KakaoResponse.valueOf(entityMessage, null);
 
         // 관계자 조회
         List<Member> members = selectMembers(userKey);
@@ -66,9 +67,9 @@ public class MemberBO extends Conversable {
                 text += "전화번호는 " + member.getMemberRoomTel() + " 주소는 " + member.getMemberAddress() + " 메일은 " + member.getMemberEmail() + " ";
             }
             text += "입니다.\n";
-            message.setText(text);
         }
 
+        message.setText(text);
         userMapper.put(userKey, Conversation.valueOf("None",null,"None", false,0));
         return KakaoResponse.valueOf(message, null);
     }

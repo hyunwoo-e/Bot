@@ -45,7 +45,7 @@ public class IntentMapper {
         intentMap.put("None", noneBO);
         intentMap.put("관계자조회", memberBO);
         intentMap.put("지하철조회", subwayBO);
-        intentMap.put("지도조회", mapBO);
+        intentMap.put("위치조회", mapBO);
         intentMap.put("학사일정조회", scheduleBO);
         intentMap.put("시간표조회", timeTableBO);
         intentMap.put("식단조회", mealBO);
