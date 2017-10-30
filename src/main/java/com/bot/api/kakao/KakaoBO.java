@@ -1,5 +1,6 @@
 package com.bot.api.kakao;
 
+import com.bot.api.core.Common;
 import com.bot.api.user.UserBO;
 import com.bot.api.core.IntentMapper;
 import com.bot.api.core.UserMapper;
@@ -52,9 +53,9 @@ public class KakaoBO {
         //현재 다이얼로그가 없을 경우 다이얼로그 생성
         if(!userMapper.containsKey(kakaoRequest.getUser_key())) {
             //학생 인증
-            //if(userBO.selectUser(kakaoRequest.getUser_key()) == null) {
-                //return makeJoinMessage(kakaoRequest.getUser_key());
-            //}
+            if(userBO.selectUser(kakaoRequest.getUser_key()) == null) {
+                return makeJoinMessage(kakaoRequest.getUser_key());
+            }
             userMapper.put(kakaoRequest.getUser_key(), Conversation.valueOf("None",null,"None", false,0));
         }
 
@@ -80,7 +81,7 @@ public class KakaoBO {
     }
 
     public LUIS makeLUISResponse(KakaoRequest kakaoRequest) {
-        String url = "http://localhost:8000";
+        String url = "http://"+Common.nlu_server_ip+":"+Common.nul_server_port;
 
         RestTemplate restTemplate;
         HttpHeaders headers;
@@ -112,7 +113,7 @@ public class KakaoBO {
         Message message = new Message();
         MessageButton messageButton = new MessageButton();
         messageButton.setLabel("등록하기");
-        messageButton.setUrl("http://125.129.148.199:8080/konkuk/user?userKey=" + userKey);
+        messageButton.setUrl("http://"+ Common.konkuk_server_ip+":"+Common.konkuk_server_port+"/konkuk/user?userKey=" + userKey);
         message.setMessage_button(messageButton);
         message.setText("건국대학교 학생 인증이 필요합니다. 아래 링크를 통해 인증해 주세요!");
         return KakaoResponse.valueOf(message, null);

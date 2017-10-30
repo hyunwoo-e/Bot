@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class NoneBO implements Conversable {
+public class NoneBO extends Conversable {
 
     @Autowired
     private UserMapper userMapper;
