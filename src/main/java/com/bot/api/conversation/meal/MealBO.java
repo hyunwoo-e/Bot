@@ -46,6 +46,8 @@ public class MealBO extends Conversable {
             buttons.add("학생회관");
             buttons.add("도서관");
             keyboard.setType("buttons");
+            keyboard.setButtons(buttons);
+            message.setText("식당을 선택해주세요.");
             return KakaoResponse.valueOf(message, keyboard);
         }
 
@@ -77,11 +79,9 @@ public class MealBO extends Conversable {
 
             text += "학생회관의 ";
             if(dateSet.contains("내일")) {
-                text += "내일식단은 ";
                 text += selectTomorrowMeals(meals);
             }
             if(!dateSet.contains("내일") || dateSet.contains("오늘")) {
-                text += "오늘식단은 ";
                 text += selectTodayMeals(meals);
             }
         }
@@ -93,33 +93,26 @@ public class MealBO extends Conversable {
                     });
             List<Meal> meals = responseEntity.getBody();
 
-            text += "상허도서기념관의 ";
+            text += "도서관의 ";
             if(dateSet.contains("내일")) {
-                text += "내일식단은 ";
                 text += selectTomorrowMeals(meals);
             }
             if(!dateSet.contains("내일") || dateSet.contains("오늘")) {
-                text += "오늘식단은 ";
                 text += selectTodayMeals(meals);
             }
         }
-
-        text += "입니다.";
         return text;
     }
 
     private String selectTodayMeals(List<Meal> meals) {
-        Date date = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.add(Calendar.DATE,1);
-        date = calendar.getTime();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyymmdd");
 
         String text = "";
         int i = 0;
+        text += "오늘 식단은 ";
         for(Meal meal : meals) {
-            if(meal.getSALES_DT().equals(simpleDateFormat.format(date))) {
+            if(meal.getSALES_DT().equals(simpleDateFormat.format(calendar.getTime()))) {
                 if(meal.getFOOD_NAME() != null)
                     text += meal.getFOOD_NAME().replaceFirst("\r\n",",");
                 if(meal.getPRICE() != null) text += "(" + meal.getPRICE() + ")";
@@ -127,6 +120,7 @@ public class MealBO extends Conversable {
                 i++;
             }
         }
+        text += "입니다\n";
 
         if(i == 0) {
             text = "오늘은 식단이 없습니다.\n";
@@ -136,13 +130,16 @@ public class MealBO extends Conversable {
     }
 
     private String selectTomorrowMeals(List<Meal> meals) {
-        Date date = new Date();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyymmdd");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE,1);
 
         String text = "";
         int i = 0;
+
+        text += "내일 식단은 ";
         for(Meal meal : meals) {
-            if(meal.getSALES_DT().equals(simpleDateFormat.format(date))) {
+            if(meal.getSALES_DT().equals(simpleDateFormat.format(calendar.getTime()))) {
                 if(meal.getFOOD_NAME() != null)
                     text += meal.getFOOD_NAME().replaceFirst("\r\n",",");
                 if(meal.getPRICE() != null) text += "(" + meal.getPRICE() + ")";
@@ -150,6 +147,7 @@ public class MealBO extends Conversable {
                 i++;
             }
         }
+        text += "입니다\n";
 
         if(i == 0) {
             text = "내일은 식단이 없습니다.\n";

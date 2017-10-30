@@ -25,6 +25,7 @@ public abstract class Conversable {
                 text += slots.get(key);
                 message.setText(text);
                 userMapper.get(userKey).setTryCount(userMapper.get(userKey).getTryCount() + 1);
+                System.out.println(userMapper.get(userKey).getTryCount());
                 return message;
             }
         }
