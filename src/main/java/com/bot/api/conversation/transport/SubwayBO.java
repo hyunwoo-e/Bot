@@ -4,6 +4,7 @@ import com.bot.api.core.Conversable;
 import com.bot.api.core.Conversation;
 import com.bot.api.core.UserMapper;
 import com.bot.api.model.kakao.KakaoResponse;
+import com.bot.api.model.kakao.Keyboard;
 import com.bot.api.model.kakao.Message;
 import com.bot.api.model.luis.LUIS;
 import com.bot.api.model.luis.Value;
@@ -19,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 @Service
@@ -32,11 +34,14 @@ public class SubwayBO implements Conversable {
     public KakaoResponse makeKakaoResponse(String userKey, LUIS luisResponse) {
         String text = "";
         Message message = new Message();
-  //      Keyboard keyboard = new Keyboard();
+        Keyboard keyboard = new Keyboard();
         Subway subwayMap;
-     //   RealtimeArrivalList realtimeArrivalList;
         ArrayList<Value> station;
         ArrayList<Value> subwayId;
+
+        ArrayList<String> station_default = new ArrayList<String>();
+        station_default.add("건대입구");
+        station_default.add("어린이대공원");
 
 
 
@@ -64,17 +69,14 @@ public class SubwayBO implements Conversable {
         //지하철 언제와???  역에 대한정보가 없을경우 지하철 언제와 7호선?
         if(!userMapper.get(userKey).getEntityMap().containsKey("장소") && !userMapper.get(userKey).getEntityMap().containsKey("호선")){
             //default = 건입과, 어대역입구 정보 제공하기
-            ArrayList<String> station_default = new ArrayList<String>();
-            station_default.add("건대입구");
-            station_default.add("어린이대공원");
 
                 for(int i=0; i<station_default.size();  i++){
-                    text += this.getSubwayInfo(this.getData(station_default.get(i)).getRealtimeArrivalList(),null);
+                    text += this.makeSubwayInfo(this.getData(station_default.get(i)).getRealtimeArrivalList(),null);
                }
-
 
         }else if(userMapper.get(userKey).getEntityMap().containsKey("장소")){
 
+            //역 정보 저장
             station = userMapper.get(userKey).getEntityMap().get("장소");
 
             //호선 정보가 있을 경우
@@ -82,12 +84,12 @@ public class SubwayBO implements Conversable {
                 subwayId = userMapper.get(userKey).getEntityMap().get("호선");
                 for(int i=0; i<station.size(); i++){
                     //건입, 어입, 등등에 대해서 받고 text를 추가함. 이때는 호선 정보 X
-                    text += this.getSubwayInfo(this.getData(station.get(i).getValue()).getRealtimeArrivalList(),subwayId);
+                    text += this.makeSubwayInfo(this.getData(station.get(i).getValue()).getRealtimeArrivalList(),subwayId);
                     }
             }else{
                 //호선정보가 없는 경우
                 for(int i=0; i<station.size(); i++){
-                    text += this.getSubwayInfo(this.getData(station.get(i).getValue()).getRealtimeArrivalList(),null);
+                    text += this.makeSubwayInfo(this.getData(station.get(i).getValue()).getRealtimeArrivalList(),null);
                 }
             }
 
@@ -110,7 +112,7 @@ public class SubwayBO implements Conversable {
     }
 
 
-    //지하철 정보 파싱
+    //지하철 정보 파싱 Input = 역이름 output = Subway객체
     public Subway getData(String station){
         RestTemplate restTemplate=null;
         HttpHeaders httpHeaders=null;
@@ -118,13 +120,9 @@ public class SubwayBO implements Conversable {
 
         String key = "526f4f714e786b613730566c676145";
         String url_subway= null;
-        try {
-            url_subway = "http://swopenapi.seoul.go.kr/api/subway/526f4f714e786b613730566c676145/json/realtimeStationArrival/1/4/"+ URLEncoder.encode(station,"utf-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-//        httpHeaders.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-//        httpEntity = new HttpEntity<String>(station, httpHeaders);
+//        http://swopenapi.seoul.go.kr/api/subway/526f4f714e786b613730566c676145/json/realtimeStationArrival/1/4/건대입구;
+        url_subway = "http://swopenapi.seoul.go.kr/api/subway/"+key+"/json/realtimeStationArrival/1/4/"+station;
+
 
         restTemplate = new RestTemplate();
         Subway subway = restTemplate.getForObject(url_subway, Subway.class);
@@ -142,12 +140,12 @@ public class SubwayBO implements Conversable {
         }
 
     //지하철 정보 반환
-    public String getSubwayInfo(RealtimeArrivalList realtimeArrivalList, ArrayList<Value> subwayId){
+    public String makeSubwayInfo(List<RealtimeArrivalList> realtimeArrivalList, ArrayList<Value> subwayId){
             String text = "";
             //호선을 비교해야하면
         if(subwayId!=null){
             //subwayId에는 1,2,3,4,5,6,7과 같은 숫자가 있음.하지만 String
-            StringTokenizer st = new StringTokenizer(realtimeArrivalList.getResultInfos().get(0).getSubwayList(),", ");
+            StringTokenizer st = new StringTokenizer(realtimeArrivalList.get(0).getSubwayList(),", ");
 
             ArrayList<String> subwayIdList = new ArrayList<String>();
             //역의 호선 정보 저장
@@ -181,23 +179,23 @@ public class SubwayBO implements Conversable {
 
 
     //지하철 정보를 텍스트로 변환 (호선이 있는 경우)
-    public String getSubwayInfoText(RealtimeArrivalList realtimeArrivalList, String subwayId){
+    public String getSubwayInfoText(List<RealtimeArrivalList> realtimeArrivalList, String subwayId){
         String text = "";
-        for (int i = 0; i < realtimeArrivalList.getResultInfos().size(); i++) {
-            if(subwayId.equals(realtimeArrivalList.getResultInfos().get(i).getSubwayId())){
-                text += realtimeArrivalList.getResultInfos().get(i).getSubwayId().substring(3) + "호선" + realtimeArrivalList.getResultInfos().get(i).getTrainLineNm() + " "
-                        + this.getTime(realtimeArrivalList.getResultInfos().get(i).getBarvlDt()) + " 현재위치 : " + realtimeArrivalList.getResultInfos().get(i).getArvlMsg3() + "\n";
+        for (int i = 0; i < realtimeArrivalList.size(); i++) {
+            if(subwayId.equals(realtimeArrivalList.get(i).getSubwayId())){
+                text += realtimeArrivalList.get(i).getSubwayId().substring(3) + "호선" + realtimeArrivalList.get(i).getTrainLineNm()+ " "
+                        + this.getTime(realtimeArrivalList.get(i).getBarvlDt()) + " 현재위치 : " + realtimeArrivalList.get(i).getArvlMsg3() + "\n";
             }
         }
         return text;
     }
 
     //지하철 정보를 텍스트로 변환 (호선이 없는 경우)
-    public String getSubwayInfoText(RealtimeArrivalList realtimeArrivalList){
+    public String getSubwayInfoText(List<RealtimeArrivalList> realtimeArrivalList){
         String text = "";
-        for (int i = 0; i < realtimeArrivalList.getResultInfos().size(); i++) {
-            text += realtimeArrivalList.getResultInfos().get(i).getSubwayId().substring(3) + "호선" + realtimeArrivalList.getResultInfos().get(i).getTrainLineNm()+ " "
-                    + this.getTime(realtimeArrivalList.getResultInfos().get(i).getBarvlDt()) + " 현재위치 : " + realtimeArrivalList.getResultInfos().get(i).getArvlMsg3() + "\n";
+        for (int i = 0; i < realtimeArrivalList.size(); i++) {
+            text += realtimeArrivalList.get(i).getSubwayId().substring(3) + "호선 " + realtimeArrivalList.get(i).getTrainLineNm()+ " "
+                    + this.getTime(realtimeArrivalList.get(i).getBarvlDt()) + " 현재위치 : " + realtimeArrivalList.get(i).getArvlMsg3() + "\n";
         }
         return text;
     }
