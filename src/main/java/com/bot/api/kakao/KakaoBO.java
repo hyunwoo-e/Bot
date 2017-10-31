@@ -66,10 +66,11 @@ public class KakaoBO {
 
         //자연어 분석(Intent가 None이거나, 강제입력의 경우 가장 최근의 Intent로 설정)
         luis = makeLUISResponse(kakaoRequest);
-        if(luis.getIntent().getIntent().equals("None") || isForceInto) {
-            //3회 실패시 Intent 초기화
-            if(tryCount > 3) {
+        if(luis.getIntent().getIntent().equals("None") || isForceInto) { // || !userMapper.get(kakaoRequest.getUser_key()).getIntent().equals("None")
+            //2회 실패시 Intent 초기화
+            if(tryCount > 1) {
                 userMapper.put(kakaoRequest.getUser_key(), Conversation.valueOf("None",null,"None", false,0));
+                intent = "None";
             }
             luis.getIntent().setIntent(intent);
         }
