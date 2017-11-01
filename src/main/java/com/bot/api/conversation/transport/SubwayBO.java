@@ -44,6 +44,7 @@ public class SubwayBO implements Conversable {
         station_default.add("어린이대공원");
 
 
+        //test
 
         //subwayInfo[0] = 호선, 1 = 방향, 2 = 도착예정시간
 
