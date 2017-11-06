@@ -13,8 +13,9 @@ public class Subwaydefault {
     // default station
     @PostConstruct
     public void init(){
+        station_default = new ArrayList<String>();
         station_default.add("건대입구");
-        station_default.add("어린이대공원");
+        station_default.add("어린이대공원(세종대)");
     }
 
     public String get(int index){

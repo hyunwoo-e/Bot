@@ -36,18 +36,23 @@ public class SubwayBO extends Conversable {
     @Autowired
     private Subwaydefault subwaydefault;
 
+    @Autowired
+    private SubwayTable subwayTable;
+
     public KakaoResponse makeKakaoResponse(String userKey, LUIS luisResponse) {
         String text = "";
         Message message = new Message();
-        Keyboard keyboard = new Keyboard();
-        Subway subwayMap;
+       // Keyboard keyboard = new Keyboard();
+     //   Subway subwayMap;
 
         ArrayList<Value> station;
         ArrayList<Value> subwayId;
 
-        //예시 2호선 장암 방향 시간정보 : 12분 37초 후 현재 위치 : 구의사거리
+        //실제 사용할 역명(맵핑)
+        ArrayList<String> stationList;
 
-        //지하철 언제와???  역에 대한정보가 없을경우 지하철 언제와 7호선?
+
+        //지하철 언제와???  역에 대한 정보가 없을경우
         if(!userMapper.get(userKey).getEntityMap().containsKey("장소") && !userMapper.get(userKey).getEntityMap().containsKey("호선")){
             //default = 건입과, 어대역입구 정보 제공하기
             for(int i=0; i<subwaydefault.size();  i++){
@@ -57,18 +62,28 @@ public class SubwayBO extends Conversable {
          }else if(userMapper.get(userKey).getEntityMap().containsKey("장소")){
             //역 정보 저장
             station = userMapper.get(userKey).getEntityMap().get("장소");
-
+            stationList = new ArrayList<String>();
+            for(int i=0; i<station.size(); i++){
+                if(station.get(i).getValue().equals("건대입구")) {
+                    stationList.add(subwayTable.get("건대입구"));
+                }else if(station.get(i).getValue().equals("어린이대공원")){
+                    stationList.add(subwayTable.get("어린이대공원"));
+                }else {
+                    stationList.add(station.get(i).getValue());
+                }
+            }
+            //station.get(0).getValue();
             //호선 정보가 있을 경우
             if(!userMapper.get(userKey).getEntityMap().containsKey("호선")){
                 subwayId = userMapper.get(userKey).getEntityMap().get("호선");
                 for(int i=0; i<station.size(); i++){
                     //건입, 어입, 등등에 대해서 받고 text를 추가함. 이때는 호선 정보 X
-                    text += this.makeSubwayInfo(this.getData(station.get(i).getValue()),subwayId);
+                    text += this.makeSubwayInfo(this.getData(stationList.get(i)),subwayId);
                 }
             }else{
                 //호선정보가 없는 경우
-                for(int i=0; i<station.size(); i++){
-                    text += this.makeSubwayInfo(this.getData(station.get(i).getValue()),null);
+                for(int i=0; i<stationList.size(); i++){
+                    text += this.makeSubwayInfo(this.getData(stationList.get(i)),null);
                 }
             }
 

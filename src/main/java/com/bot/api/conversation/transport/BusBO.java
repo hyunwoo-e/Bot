@@ -47,20 +47,6 @@ public class BusBO extends Conversable {
         ArrayList<BusStop> busStopList;
 
         /*
-
-        정문  건대입구역사거리, 건대병원 : 104000139 - 05232 위로           --> 건입!
-              건대입구역사거리, 건대병원 : 104000136 - 05229 아래로         --> 건입!
-        후문  건대앞 : 104000138 - 05231 >>                                 --> 어대
-              건대앞 : 104000050 - 05143 <<                                 --> 어대
-         */
-
-        /*
-            <
-           건입 , 건대입구역, 건대입구 -> 건대입구역사거리, 건대병원
-
-           어대역, 어대정류장, 어대정류소, 어대 -> 건대앞
-         */
-        /*
         1) 버스 언제와 -> default 값으로 건입, 어대역 버스 제공.. 양방향 쫌많은거 같은데?
         2) @@역에 버스 언제와? -> 해당역이 존재할 경우 역에 해당하는 버스 정보 제공 or 역 정보가 옳지 않다고 말하기
         3) 302번 버스 언제와? -> 정류소 위치 묻기 -> 정류소 정보가 제공되었을 때 정류소가 존재하는지 확인. 존재하면 @@역 버스 정보 제공 아니면 정류소 없다고말하기
@@ -68,7 +54,7 @@ public class BusBO extends Conversable {
          */
 
         //장소와 버스 번호가 없을 경우
-        if(!userMapper.get(userKey).getEntityMap().containsKey("장소") && !userMapper.get(userKey).getEntityMap().containsKey("버스번호")){
+        if(!userMapper.get(userKey).getEntityMap().containsKey("장소") && !userMapper.get(userKey).getEntityMap().containsKey("숫자")){
             //station_default 제공
             for(int i=0; i<busdefault.size(); i++){
                 if(i==0)
@@ -89,11 +75,11 @@ public class BusBO extends Conversable {
             for(int i=0; i<station.size(); i++){
                 if(station.get(i).getValue().equals("건대입구")){
                     stationList.add(busStopTable.get("건대입구"));
+                }else if(station.get(i).getValue().equals("어린이대공원")){
+                    stationList.add(busStopTable.get("어린이대공원"));
+                }else {
+                    stationList.add(station.get(i).getValue());
                 }
-                if(station.get(i).getValue().equals("어린이대공원(세종대)")){
-                    stationList.add(busStopTable.get("어린이대공원(세종대)"));
-                }
-                stationList.add(station.get(i).getValue());
             }
 
             //버스정류소 정보 맵핑
@@ -103,7 +89,7 @@ public class BusBO extends Conversable {
             }
 
             ArrayList<BusStationList> busStationLists;
-            if(!userMapper.get(userKey).getEntityMap().containsKey("버스번호")){
+            if(!userMapper.get(userKey).getEntityMap().containsKey("숫자")){
                 //버스번호가 없다면 해당정류소의 모든 버스 정보제공
                 for(int i=0; i<busStopList.size(); i++){
                     busStationLists = busStopList.get(i).getMsgBody().getBusStationList();
@@ -113,7 +99,7 @@ public class BusBO extends Conversable {
                 }
             }else{
                 //버스번호가 있다면!? 그 버스정류소에서 해당하는 숫자의 버스 정보만 제공하기
-                busNumberList = userMapper.get(userKey).getEntityMap().get("버스번호");
+                busNumberList = userMapper.get(userKey).getEntityMap().get("숫자");
                 for(int i=0; i<busStopList.size(); i++){
                     busStationLists = busStopList.get(i).getMsgBody().getBusStationList();
                     for(int j=0; j<busStationLists.size(); j++){
@@ -124,7 +110,7 @@ public class BusBO extends Conversable {
                 }
             }
 
-        }else if(userMapper.get(userKey).getEntityMap().containsKey("버스번호")){
+        }else if(userMapper.get(userKey).getEntityMap().containsKey("숫자")){
             //slot 사용해서 물어보기
             HashMap<String, String> slots = new HashMap<String, String>();
             slots.put("장소", "정류소 명을 입력해주세요");

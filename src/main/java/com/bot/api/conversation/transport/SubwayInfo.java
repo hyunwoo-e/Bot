@@ -11,6 +11,7 @@ public class SubwayInfo {
     // subwayIdList
     @PostConstruct
     public void init(){
+        subwayIdMaps = new HashMap<String, String>();
         subwayIdMaps.put("1001","1호선");
         subwayIdMaps.put("1002","2호선");
         subwayIdMaps.put("1003","3호선");
