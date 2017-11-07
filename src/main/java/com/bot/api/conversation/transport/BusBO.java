@@ -14,6 +14,7 @@ import com.bot.api.model.transportation.Bus.StopInfo.BusStationList;
 import com.bot.api.model.transportation.Bus.StopInfo.BusStop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.AsyncRestTemplate;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -132,7 +133,9 @@ public class BusBO extends Conversable {
 
     //정류소 id로 도착하는 버스 정보
     public BusArrival getBusArrival(String stationId){
+        BusArrival busArrival = null;
         RestTemplate restTemplate = new RestTemplate();
+        AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
         //orginal key
         // String key = "ihXrHl%2F6vXM4XArXesQyaEYv3SiIEYJwW9bevTFoVdZ0ZNIGRVAMU%2FN2G9kHohYLUgakPcXnWI6knmQcul1u7Q%3D%3D";
 
@@ -141,8 +144,8 @@ public class BusBO extends Conversable {
         String url_busArrival = "http://ws.bus.go.kr/api/rest/arrive/getLowArrInfoByStId?ServiceKey="+key+"&stId="+stationId;
 
 
-        BusArrival busArrival = restTemplate.getForObject(url_busArrival, BusArrival.class);
-
+//        BusArrival busArrival = restTemplate.getForObject(url_busArrival, BusArrival.class);
+        busArrival = (BusArrival)asyncRestTemplate.getForEntity(url_busArrival, BusArrival.class);
 
         return busArrival;
     }
@@ -151,7 +154,9 @@ public class BusBO extends Conversable {
     //역 입력하여 정류소 id 얻음 ..  input = 역이름(100퍼일치하게해야함) output = BusStop객체
     public BusStop getBusStop(String station){
 
+        BusStop busStop = null;
         RestTemplate restTemplate = new RestTemplate();
+        AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
         //   String key = "ihXrHl%2F6vXM4XArXesQyaEYv3SiIEYJwW9bevTFoVdZ0ZNIGRVAMU%2FN2G9kHohYLUgakPcXnWI6knmQcul1u7Q%3D%3D";
 
         //decoding key
@@ -159,7 +164,8 @@ public class BusBO extends Conversable {
 
         String url_busStop = "http://openapi.gbis.go.kr/ws/rest/busstationservice?serviceKey="+key+"&keyword="+station;
 
-        BusStop busStop = restTemplate.getForObject(url_busStop,BusStop.class);
+//        BusStop busStop = restTemplate.getForObject(url_busStop,BusStop.class);
+        busStop = (BusStop)asyncRestTemplate.getForEntity(url_busStop, BusStop.class);
 
         return busStop;
 
@@ -199,7 +205,6 @@ public class BusBO extends Conversable {
                     break;
                 }else{
                     if(i==busArrivalList.size()-1) {
-                        text += busArrivalList.get(STANDARD).getStNm() + " 정류소\n";
                         text += busNumber + " 버스 정보가 없습니다.\n";
                     }
                 }

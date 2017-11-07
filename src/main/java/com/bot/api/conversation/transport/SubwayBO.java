@@ -10,7 +10,10 @@ import com.bot.api.model.luis.Value;
 import com.bot.api.model.transportation.Subway.Subway;
 import com.bot.api.model.transportation.Subway.Train;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.AsyncRestTemplate;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -126,7 +129,9 @@ public class SubwayBO extends Conversable {
 
     //지하철 정보 파싱 Input = 역이름 output = Subway객체
     public Subway getData(String station) {
+        Subway subway = null;
         RestTemplate restTemplate = null;
+        AsyncRestTemplate asyncRestTemplate = null;
 //        HttpHeaders httpHeaders=null;
 //        HttpEntity<String> httpEntity;
 
@@ -136,8 +141,11 @@ public class SubwayBO extends Conversable {
         url_subway = "http://swopenapi.seoul.go.kr/api/subway/" + key + "/json/realtimeStationArrival/1/8/" + station;
 
 
-        restTemplate = new RestTemplate();
-        Subway subway = restTemplate.getForObject(url_subway, Subway.class);
+     //   restTemplate = new RestTemplate();
+        asyncRestTemplate = new AsyncRestTemplate();
+//        Subway subway = restTemplate.getForObject(url_subway, Subway.class);
+        subway = (Subway) asyncRestTemplate.getForEntity(url_subway, Subway.class);
+//        ResponseEntity<Subway> subwayResponseEntity = (ResponseEntity<Subway>) asyncRestTemplate.getForEntity(url_subway, Subway.class);
 
         return subway;
     }
@@ -178,13 +186,15 @@ public class SubwayBO extends Conversable {
                         //일치한다면
                         System.out.println("get Line Text");
                         text += this.getSubwayInfoText(subway, subwayIdList.get(j));
+                        break;
                     }else{
+                        //끝까지 탐색했는데 값이 없다면
+                        if(j==subwayIdList.size()-1){
+                            text += subwayId.get(i).getValue() + " 정보가 존재하지 않습니다.\n";
+                        }
                     }
                 }
-          //      text += "요청 정보가 존재하지 않습니다.\n";
-                //subwayId.get(i).getValue()
             }
-         //   subwayIdList = null;
 
         } else {
             //호선을 비교할필요가 없으면
