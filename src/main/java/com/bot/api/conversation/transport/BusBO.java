@@ -1,6 +1,7 @@
 package com.bot.api.conversation.transport;
 
 import com.bot.api.core.Conversable;
+import com.bot.api.core.Conversation;
 import com.bot.api.core.UserMapper;
 import com.bot.api.model.kakao.KakaoResponse;
 import com.bot.api.model.kakao.Keyboard;
@@ -56,6 +57,7 @@ public class BusBO extends Conversable {
         //장소와 버스 번호가 없을 경우
         if(!userMapper.get(userKey).getEntityMap().containsKey("장소") && !userMapper.get(userKey).getEntityMap().containsKey("숫자")){
             //station_default 제공
+            System.out.println("default Bus");
             for(int i=0; i<busdefault.size(); i++){
                 if(i==0)
                     text += "정문\n";
@@ -91,6 +93,7 @@ public class BusBO extends Conversable {
             ArrayList<BusStationList> busStationLists;
             if(!userMapper.get(userKey).getEntityMap().containsKey("숫자")){
                 //버스번호가 없다면 해당정류소의 모든 버스 정보제공
+                System.out.println("bus Stop exist");
                 for(int i=0; i<busStopList.size(); i++){
                     busStationLists = busStopList.get(i).getMsgBody().getBusStationList();
                     for(int j=0; j<busStationLists.size(); j++){
@@ -122,6 +125,7 @@ public class BusBO extends Conversable {
         }else{}
 
         message.setText(text);
+        userMapper.put(userKey, Conversation.valueOf("None",null,"None", false,0));
         return KakaoResponse.valueOf(message,null);
 
     }
@@ -175,24 +179,29 @@ public class BusBO extends Conversable {
     public String getBusArrivalInfoText(BusArrival busArrival, String busNumber){
         String text = "";
         ArrayList<ItemList> busArrivalList = busArrival.getMsgBody().getItemList();
-
+        System.out.println("getBusArrivalInfoText");
         if(busNumber==null) {
-            text += busArrivalList.get(STANDARD).getStNm() + " 정류소 정보\n";
+            System.out.println("busNumber exist");
+            text += busArrivalList.get(STANDARD).getStNm() + " 정류소\n";
             for (int i = 0; i < busArrivalList.size(); i++) {
-                text += busArrivalList.get(i).getRtNm() + "버스\n" +
+                text += busArrivalList.get(i).getRtNm() + " 버스\n" +
                         "첫번째 버스 " + busArrivalList.get(i).getArrmsg1() + "\n" +
                         "두번째 버스 " + busArrivalList.get(i).getArrmsg2() + "\n";
             }
         }else{
+            System.out.println("busNumber exist");
             for(int i=0; i<busArrivalList.size(); i++){
                 if(busNumber.equals(busArrivalList.get(i).getRtNm())){
-                    text += busArrivalList.get(STANDARD).getStNm() + " 정류소 정보\n";
-                    text += busArrivalList.get(i).getRtNm() + "버스\n" +
+                    text += busArrivalList.get(STANDARD).getStNm() + " 정류소\n";
+                    text += busArrivalList.get(i).getRtNm() + " 버스\n" +
                             "첫번째 버스 " + busArrivalList.get(i).getArrmsg1() + "\n" +
                             "두번째 버스 " + busArrivalList.get(i).getArrmsg2() + "\n";
                     break;
                 }else{
-                //    text += busArrivalList.get(i).getRtNm() + "버스 정보가 없습니다.";
+                    if(i==busArrivalList.size()-1) {
+                        text += busArrivalList.get(STANDARD).getStNm() + " 정류소\n";
+                        text += busNumber + " 버스 정보가 없습니다.\n";
+                    }
                 }
             }
         }
@@ -201,17 +210,3 @@ public class BusBO extends Conversable {
 
 //body end
 }
-
-
-//    public KakaoResponse makeKakaoResponse(String userKey, LUIS luisResponse) {
-//        Message message = new Message();
-//        Keyboard keyboard = new Keyboard();
-//
-//        //TODO: 기능 요약
-//        String text =
-//                "버스 조회 기능은 추가될 예정입니다.\n";
-//
-//        message.setText(text);
-//        userMapper.put(userKey, Conversation.valueOf("None",null,"None", false,0));
-//        return KakaoResponse.valueOf(message, null);
-//    }
