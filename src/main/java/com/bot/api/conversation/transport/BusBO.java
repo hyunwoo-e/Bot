@@ -12,13 +12,17 @@ import com.bot.api.model.transportation.Bus.ArrivalInfo.BusArrival;
 import com.bot.api.model.transportation.Bus.ArrivalInfo.ItemList;
 import com.bot.api.model.transportation.Bus.StopInfo.BusStationList;
 import com.bot.api.model.transportation.Bus.StopInfo.BusStop;
+import com.bot.api.model.transportation.Subway.Subway;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.client.AsyncRestTemplate;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
 
 @Service
 public class BusBO extends Conversable {
@@ -134,7 +138,6 @@ public class BusBO extends Conversable {
     //정류소 id로 도착하는 버스 정보
     public BusArrival getBusArrival(String stationId){
         BusArrival busArrival = null;
-        RestTemplate restTemplate = new RestTemplate();
         AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
         //orginal key
         // String key = "ihXrHl%2F6vXM4XArXesQyaEYv3SiIEYJwW9bevTFoVdZ0ZNIGRVAMU%2FN2G9kHohYLUgakPcXnWI6knmQcul1u7Q%3D%3D";
@@ -144,8 +147,16 @@ public class BusBO extends Conversable {
         String url_busArrival = "http://ws.bus.go.kr/api/rest/arrive/getLowArrInfoByStId?ServiceKey="+key+"&stId="+stationId;
 
 
-//        BusArrival busArrival = restTemplate.getForObject(url_busArrival, BusArrival.class);
-        busArrival = (BusArrival)asyncRestTemplate.getForEntity(url_busArrival, BusArrival.class);
+//        busArrival = (BusArrival)asyncRestTemplate.getForEntity(url_busArrival, BusArrival.class);
+
+        ListenableFuture<ResponseEntity<BusArrival>> responseEntityListenableFuture = asyncRestTemplate.getForEntity(url_busArrival, BusArrival.class);
+        try {
+            busArrival = responseEntityListenableFuture.get().getBody();
+        } catch (InterruptedException e) {
+           // e.printStackTrace();
+        } catch (ExecutionException e) {
+          //  e.printStackTrace();
+        }
 
         return busArrival;
     }
@@ -155,7 +166,6 @@ public class BusBO extends Conversable {
     public BusStop getBusStop(String station){
 
         BusStop busStop = null;
-        RestTemplate restTemplate = new RestTemplate();
         AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
         //   String key = "ihXrHl%2F6vXM4XArXesQyaEYv3SiIEYJwW9bevTFoVdZ0ZNIGRVAMU%2FN2G9kHohYLUgakPcXnWI6knmQcul1u7Q%3D%3D";
 
@@ -164,8 +174,14 @@ public class BusBO extends Conversable {
 
         String url_busStop = "http://openapi.gbis.go.kr/ws/rest/busstationservice?serviceKey="+key+"&keyword="+station;
 
-//        BusStop busStop = restTemplate.getForObject(url_busStop,BusStop.class);
-        busStop = (BusStop)asyncRestTemplate.getForEntity(url_busStop, BusStop.class);
+        ListenableFuture<ResponseEntity<BusStop>> responseEntityListenableFuture = asyncRestTemplate.getForEntity(url_busStop, BusStop.class);
+        try {
+            busStop = responseEntityListenableFuture.get().getBody();
+        } catch (InterruptedException e) {
+            //e.printStackTrace();
+        } catch (ExecutionException e) {
+            //e.printStackTrace();
+        }
 
         return busStop;
 

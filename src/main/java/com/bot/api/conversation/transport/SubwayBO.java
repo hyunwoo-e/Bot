@@ -10,9 +10,9 @@ import com.bot.api.model.luis.Value;
 import com.bot.api.model.transportation.Subway.Subway;
 import com.bot.api.model.transportation.Subway.Train;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.client.AsyncRestTemplate;
 import org.springframework.web.client.RestTemplate;
 
@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.concurrent.ExecutionException;
 
 @Service
 public class SubwayBO extends Conversable {
@@ -132,7 +133,7 @@ public class SubwayBO extends Conversable {
         Subway subway = null;
         RestTemplate restTemplate = null;
         AsyncRestTemplate asyncRestTemplate = null;
-//        HttpHeaders httpHeaders=null;
+        HttpHeaders httpHeaders=null;
 //        HttpEntity<String> httpEntity;
 
         String key = "526f4f714e786b613730566c676145";
@@ -144,8 +145,15 @@ public class SubwayBO extends Conversable {
      //   restTemplate = new RestTemplate();
         asyncRestTemplate = new AsyncRestTemplate();
 //        Subway subway = restTemplate.getForObject(url_subway, Subway.class);
-        subway = (Subway) asyncRestTemplate.getForEntity(url_subway, Subway.class);
-//        ResponseEntity<Subway> subwayResponseEntity = (ResponseEntity<Subway>) asyncRestTemplate.getForEntity(url_subway, Subway.class);
+        ListenableFuture<ResponseEntity<Subway>> responseEntityListenableFuture = asyncRestTemplate.getForEntity(url_subway, Subway.class);
+        try {
+            subway = responseEntityListenableFuture.get().getBody();
+        } catch (InterruptedException e) {
+            //e.printStackTrace();
+        } catch (ExecutionException e) {
+            //e.printStackTrace();
+        }
+
 
         return subway;
     }
