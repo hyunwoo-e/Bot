@@ -82,7 +82,7 @@ public class KakaoBO {
     }
 
     public LUIS makeLUISResponse(KakaoRequest kakaoRequest) {
-        String url = "http://"+Common.nlu_server_ip+":"+Common.nul_server_port;
+        String url = "http://"+Common.nlu_server_ip+":"+Common.nlu_server_port;
 
         RestTemplate restTemplate;
         HttpHeaders headers;

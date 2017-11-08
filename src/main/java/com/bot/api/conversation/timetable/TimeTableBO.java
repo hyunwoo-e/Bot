@@ -50,7 +50,7 @@ public class TimeTableBO extends Conversable {
         dayMap.put("금요일",5);
         dayMap.put("토요일",6);
 
-        Calendar calendar = Calendar.getInstance( );  // 현재 날짜/시간 등의 각종 정보 얻기
+        Calendar calendar = Calendar.getInstance( );
         Integer LT_DAY = dayMap.get(week[calendar.get(Calendar.DAY_OF_WEEK) - 1]);
         if(userMapper.get(userKey).getEntityMap().containsKey("요일")) {
             LT_DAY = dayMap.get(userMapper.get(userKey).getEntityMap().get("요일").get(0).getValue());

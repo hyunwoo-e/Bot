@@ -45,10 +45,10 @@ public class MemberBO extends Conversable {
         List<Member> members = selectMembers(userKey);
         for (Member member : members) {
             text += member.getMemberDepartment() + " " + member.getMemberName() + member.getMemberType() + "님의 ";
-            if (userMapper.get(userKey).getEntityMap().containsKey("정보")) {
+            if (userMapper.get(userKey).getEntityMap().containsKey("프로필")) {
                 // 중복 제거
                 HashSet<String> infoSet = new HashSet<String>();
-                for(Value value : userMapper.get(userKey).getEntityMap().get("정보")) {
+                for(Value value : userMapper.get(userKey).getEntityMap().get("프로필")) {
                     infoSet.add(value.getValue());
                 }
 

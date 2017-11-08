@@ -6,7 +6,6 @@
     <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
         <property name="url" value="jdbc:mysql://localhost:3306/bot?useSSL=false"></property>
-        <!--property name="url" value="jdbc:mysql://ec2-18-220-97-254.us-east-2.compute.amazonaws.com:3306/bot?useSSL=false"></property-->
         <property name="username" value="bot"></property>
         <property name="password" value="bot"></property>
     </bean>
