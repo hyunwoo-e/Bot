@@ -55,14 +55,12 @@ public class SubwayBO extends Conversable {
         //지하철 언제와???  역에 대한 정보가 없을경우
         if (!userMapper.get(userKey).getEntityMap().containsKey("장소") && !userMapper.get(userKey).getEntityMap().containsKey("호선")) {
             //default = 건입과, 어대역입구 정보 제공하기
-            System.out.println("Default Subway");
             for (int i = 0; i < subwaydefault.size(); i++) {
                 if(i==0)
                     text += "건대입구역\n";
                 else
                     text += "어린이대공원역\n";
 
-                System.out.println(subwaydefault.get(i));
                 text += this.makeSubwayInfo(this.getData(subwaydefault.get(i)), null);
 
             }
@@ -81,13 +79,10 @@ public class SubwayBO extends Conversable {
                     stationList.add(station.get(i).getValue());
                 }
             }
-            for(int i=0; i< stationList.size(); i++){
-                System.out.println(stationList.get(i));
-            }
+
             //station.get(0).getValue();
             //호선 정보가 있을 경우
             if (userMapper.get(userKey).getEntityMap().containsKey("호선")) {
-                System.out.println("Line Info exist");
                 subwayId = userMapper.get(userKey).getEntityMap().get("호선");
                 for (int i = 0; i < station.size(); i++) {
                     //건입, 어입, 등등에 대해서 받고 text를 추가함. 이때는 호선 정보 X
@@ -95,10 +90,8 @@ public class SubwayBO extends Conversable {
                 }
             } else {
                 //호선정보가 없는 경우
-                System.out.println("No Line Info");
 
                 for (int i = 0; i < stationList.size(); i++) {
-                    System.out.println(stationList.get(i));
                     text += this.makeSubwayInfo(this.getData(stationList.get(i)), null);
                 }
             }
@@ -175,24 +168,21 @@ public class SubwayBO extends Conversable {
         if (subwayId != null) {
             //subwayId에는 1,2,3,4,5,6,7과 같은 숫자가 있음.하지만 String
             StringTokenizer st = new StringTokenizer(subway.getRealtimeArrivalList().get(STANDARD).getSubwayList(), ", ");
-            System.out.println("subwayId check");
             ArrayList<String> subwayIdList = new ArrayList<String>();
             //역의 호선 정보 저장
             while (st.hasMoreTokens()) {
                 subwayIdList.add(st.nextToken());
             }
-            for(int i=0; i<subwayIdList.size(); i++){
-                System.out.println("SubwayIdList :"+subwayIdList.get(i));
-            }
+
             //요청한 호선과 실제 연결된 호선 정보 비교
             //subwayList 는 1002, 1003, 1004 현재 역의 실제 정보를 가지고 있음
             //subwayId 는 value즉 요청한 값들임 -> 2호선 ,7호선이런거 2호선이 들어왔으 subwayId만큼 비교하면됨
+
             for (int i = 0; i < subwayId.size(); i++) {
                 for (int j = 0; j < subwayIdList.size(); j++) {
                     //요청한 값에 대해서 실제 값들과 비교 요청값= i 실제 가능한 값 = j 끝에는 1001 과 1001이런걸 비교하게됨
                     if (subwayId.get(i).getValue().equals(subwayIdInfo.get(subwayIdList.get(j)))) {
                         //일치한다면
-                        System.out.println("get Line Text");
                         text += this.getSubwayInfoText(subway, subwayIdList.get(j));
                         break;
                     }else{
@@ -221,7 +211,6 @@ public class SubwayBO extends Conversable {
         //열차별로 방향별로 한개씩 정보를 저장해야함.
         ArrayList<Train> trains = new ArrayList<Train>();
         Train train = null;
-        System.out.println("사이즈 " + subway.getRealtimeArrivalList().size());
         // total size 만큼 반복 but subway가 없다면..
         if(subway.getRealtimeArrivalList().size()==0){
             text += "현재 운행중인 지하철이 없습니다.\n";

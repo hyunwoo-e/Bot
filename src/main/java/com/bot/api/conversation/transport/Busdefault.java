@@ -37,5 +37,8 @@ public class Busdefault {
     public String get(int index){
         return station_default.get(index);
     }
+    public ArrayList<String> getStation_default(){
+        return station_default;
+    }
 
 }

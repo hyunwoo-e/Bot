@@ -10,15 +10,13 @@ import com.bot.api.model.luis.LUIS;
 import com.bot.api.model.luis.Value;
 import com.bot.api.model.transportation.Bus.ArrivalInfo.BusArrival;
 import com.bot.api.model.transportation.Bus.ArrivalInfo.ItemList;
-import com.bot.api.model.transportation.Bus.StopInfo.BusStationList;
 import com.bot.api.model.transportation.Bus.StopInfo.BusStop;
-import com.bot.api.model.transportation.Subway.Subway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.client.AsyncRestTemplate;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,10 +35,13 @@ public class BusBO extends Conversable {
     @Autowired
     private BusStopTable busStopTable;
 
-    public KakaoResponse makeKakaoResponse(String userKey, LUIS luisResponse)  {
+    public KakaoResponse makeKakaoResponse(String userKey, LUIS luisResponse){
         String text = "";
         Message message = new Message();
-        Keyboard keyboard = new Keyboard();
+      //  Keyboard keyboard = new Keyboard();
+
+     //   BusStop busStop;
+     //   BusArrival busArrival;
 
         //변환 전
         ArrayList<Value> station;
@@ -50,28 +51,23 @@ public class BusBO extends Conversable {
         ArrayList<String> stationList;
 
         //변환 후 정류소 정보 -> 정류소 Id
-        ArrayList<BusStop> busStopList;
+        ArrayList<String> stationIdList;
 
-        /*
-        1) 버스 언제와 -> default 값으로 건입, 어대역 버스 제공.. 양방향 쫌많은거 같은데?
-        2) @@역에 버스 언제와? -> 해당역이 존재할 경우 역에 해당하는 버스 정보 제공 or 역 정보가 옳지 않다고 말하기
-        3) 302번 버스 언제와? -> 정류소 위치 묻기 -> 정류소 정보가 제공되었을 때 정류소가 존재하는지 확인. 존재하면 @@역 버스 정보 제공 아니면 정류소 없다고말하기
-        4) @@역 ㅇㅇ버스 ㅁㅁ역 ㅂㅂ버스 언제와? 모든 역 버스 조회후..
-         */
+        //도착정보들 리스트 정보 ->
+
+
+       // ArrayList<ListenableFuture<ResponseEntity<BusArrival>>> busArrivalListfuture;
+        ArrayList<ListenableFuture<ResponseEntity<BusStop>>> busStopListfuture;
 
         //장소와 버스 번호가 없을 경우
         if(!userMapper.get(userKey).getEntityMap().containsKey("장소") && !userMapper.get(userKey).getEntityMap().containsKey("숫자")){
             //station_default 제공
-            System.out.println("default Bus");
-            for(int i=0; i<busdefault.size(); i++){
-                if(i==0)
-                    text += "정문\n";
-                else if(i==2)
-                    text += "후문\n";
-                else
-
-                    text += this.makeBusArrivalInfo(this.getBusArrival(busdefault.get(i)), null);
+            try {
+                text += this.makeBusArrivalInfo(this.getBusArrival(busdefault.getStation_default()),null);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+
         }else if(userMapper.get(userKey).getEntityMap().containsKey("장소")){
             //Entity 정류소 장소 정보 받기
             station = userMapper.get(userKey).getEntityMap().get("장소");
@@ -89,35 +85,39 @@ public class BusBO extends Conversable {
                 }
             }
 
-            //버스정류소 정보 맵핑
-            busStopList = new ArrayList<BusStop>();
-            for(int i=0; i<stationList.size(); i++){
-                busStopList.add(this.getBusStop(stationList.get(i)));
-            }
+            //이제 이거를 busId로 바꿔야함.
 
-            ArrayList<BusStationList> busStationLists;
+            //버스정류소 정보를 스트링 맵핑
+            stationIdList = new ArrayList<String>();
+            busStopListfuture = this.getBusStop(stationList);
+
+            for(int i=0; i<busStopListfuture.size(); i++){
+                try {
+                    for(int j=0; j<busStopListfuture.get(i).get().getBody().getMsgBody().getBusStationList().size(); j++){
+                        stationIdList.add(busStopListfuture.get(i).get().getBody().getMsgBody().getBusStationList().get(j).getStationId());
+                    }
+                } catch (Exception e){
+//                    e.printStackTrace();
+                }
+            }
             if(!userMapper.get(userKey).getEntityMap().containsKey("숫자")){
                 //버스번호가 없다면 해당정류소의 모든 버스 정보제공
-                System.out.println("bus Stop exist");
-                for(int i=0; i<busStopList.size(); i++){
-                    busStationLists = busStopList.get(i).getMsgBody().getBusStationList();
-                    for(int j=0; j<busStationLists.size(); j++){
-                        text += this.makeBusArrivalInfo(this.getBusArrival(busStationLists.get(j).getStationId()), null);
-                    }
+                try {
+                    text += this.makeBusArrivalInfo(this.getBusArrival(stationIdList),null);
+                } catch (Exception e) {
+                  //  e.printStackTrace();
                 }
             }else{
                 //버스번호가 있다면!? 그 버스정류소에서 해당하는 숫자의 버스 정보만 제공하기
                 busNumberList = userMapper.get(userKey).getEntityMap().get("숫자");
-                for(int i=0; i<busStopList.size(); i++){
-                    busStationLists = busStopList.get(i).getMsgBody().getBusStationList();
-                    for(int j=0; j<busStationLists.size(); j++){
-                        for(int k=0; k<busNumberList.size(); k++){
-                            text += this.makeBusArrivalInfo(this.getBusArrival(busStationLists.get(j).getStationId()), busNumberList.get(k).getValue());
-                        }
+                for(int i=0; i<busNumberList.size(); i++){
+                    try {
+                        text += this.makeBusArrivalInfo(this.getBusArrival(stationIdList),busNumberList.get(i).getValue());
+                    } catch (Exception e) {
+                      //  e.printStackTrace();
                     }
                 }
             }
-
         }else if(userMapper.get(userKey).getEntityMap().containsKey("숫자")){
             //slot 사용해서 물어보기
             HashMap<String, String> slots = new HashMap<String, String>();
@@ -126,104 +126,95 @@ public class BusBO extends Conversable {
             Message entityMessage;
             if((entityMessage = super.findNullEntity(userKey,slots)) != null)
                 return KakaoResponse.valueOf(entityMessage, null);
-
         }else{}
 
         message.setText(text);
         userMapper.put(userKey, Conversation.valueOf("None",null,"None", false,0));
         return KakaoResponse.valueOf(message,null);
-
     }
 
+
     //정류소 id로 도착하는 버스 정보
-    public BusArrival getBusArrival(String stationId){
+    public ArrayList<ArrayList<ItemList>> getBusArrival(ArrayList<String> stationIdList) throws Exception{
         BusArrival busArrival = null;
         AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
-        //orginal key
-        // String key = "ihXrHl%2F6vXM4XArXesQyaEYv3SiIEYJwW9bevTFoVdZ0ZNIGRVAMU%2FN2G9kHohYLUgakPcXnWI6knmQcul1u7Q%3D%3D";
 
         //decoding key
         String key = "ihXrHl/6vXM4XArXesQyaEYv3SiIEYJwW9bevTFoVdZ0ZNIGRVAMU/N2G9kHohYLUgakPcXnWI6knmQcul1u7Q==";
-        String url_busArrival = "http://ws.bus.go.kr/api/rest/arrive/getLowArrInfoByStId?ServiceKey="+key+"&stId="+stationId;
+        String url_busArrival = "http://ws.bus.go.kr/api/rest/arrive/getLowArrInfoByStId?ServiceKey="+key+"&stId=";
 
-
-//        busArrival = (BusArrival)asyncRestTemplate.getForEntity(url_busArrival, BusArrival.class);
-
-        ListenableFuture<ResponseEntity<BusArrival>> responseEntityListenableFuture = asyncRestTemplate.getForEntity(url_busArrival, BusArrival.class);
-        try {
-            busArrival = responseEntityListenableFuture.get().getBody();
-        } catch (InterruptedException e) {
-           // e.printStackTrace();
-        } catch (ExecutionException e) {
-          //  e.printStackTrace();
+        //정류소 id로 도착 버스 요청
+        ArrayList<ListenableFuture<ResponseEntity<BusArrival>>> busArrivalList = new ArrayList<ListenableFuture<ResponseEntity<BusArrival>>>();
+        for(int i=0; i<stationIdList.size(); i++){
+            ListenableFuture<ResponseEntity<BusArrival>> responseEntity = asyncRestTemplate.getForEntity(url_busArrival+stationIdList.get(i), BusArrival.class);
+            busArrivalList.add(responseEntity);
+        }
+        ArrayList<ArrayList<ItemList>> busArrivals = new ArrayList<ArrayList<ItemList>>();
+        for(int i=0; i<busArrivalList.size(); i++){
+            busArrivals.add(busArrivalList.get(i).get().getBody().getMsgBody().getItemList());
         }
 
-        return busArrival;
+        return busArrivals;
     }
 
-
     //역 입력하여 정류소 id 얻음 ..  input = 역이름(100퍼일치하게해야함) output = BusStop객체
-    public BusStop getBusStop(String station){
+    public ArrayList<ListenableFuture<ResponseEntity<BusStop>>> getBusStop(ArrayList<String> stationList){
 
-        BusStop busStop = null;
+    //    BusStop busStop = null;
         AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
         //   String key = "ihXrHl%2F6vXM4XArXesQyaEYv3SiIEYJwW9bevTFoVdZ0ZNIGRVAMU%2FN2G9kHohYLUgakPcXnWI6knmQcul1u7Q%3D%3D";
 
         //decoding key
         String key = "ihXrHl/6vXM4XArXesQyaEYv3SiIEYJwW9bevTFoVdZ0ZNIGRVAMU/N2G9kHohYLUgakPcXnWI6knmQcul1u7Q==";
+        String url_busStop = "http://openapi.gbis.go.kr/ws/rest/busstationservice?serviceKey="+key+"&keyword=";
 
-        String url_busStop = "http://openapi.gbis.go.kr/ws/rest/busstationservice?serviceKey="+key+"&keyword="+station;
-
-        ListenableFuture<ResponseEntity<BusStop>> responseEntityListenableFuture = asyncRestTemplate.getForEntity(url_busStop, BusStop.class);
-        try {
-            busStop = responseEntityListenableFuture.get().getBody();
-        } catch (InterruptedException e) {
-            //e.printStackTrace();
-        } catch (ExecutionException e) {
-            //e.printStackTrace();
+        //입력받은 역명'들'을 async - rest 요청
+        ArrayList<ListenableFuture<ResponseEntity<BusStop>>> busStopList = new ArrayList<ListenableFuture<ResponseEntity<BusStop>>>();
+        for(int i=0; i<stationList.size(); i++) {
+            ListenableFuture<ResponseEntity<BusStop>> responseEntity = asyncRestTemplate.getForEntity(url_busStop+stationList.get(i), BusStop.class);
+            busStopList.add(responseEntity);
         }
-
-        return busStop;
-
+        return busStopList;
     }
-
-    //정류소 정보 만들기
-    public String makeBusArrivalInfo(BusArrival busArrival, String busNumber){
-        String text = "";
-
-        text += this.getBusArrivalInfoText(busArrival, busNumber);
-
-        return text;
-    }
-
 
     //정류소 정보 텍스트 출력
-    public String getBusArrivalInfoText(BusArrival busArrival, String busNumber){
+    @Async
+    public String makeBusArrivalInfo(ArrayList<ArrayList<ItemList>> busArrivalList, String busNumber) throws Exception{
         String text = "";
-        ArrayList<ItemList> busArrivalList = busArrival.getMsgBody().getItemList();
-        System.out.println("getBusArrivalInfoText");
-        if(busNumber==null) {
-            System.out.println("busNumber exist");
-            text += busArrivalList.get(STANDARD).getStNm() + " 정류소\n";
-            for (int i = 0; i < busArrivalList.size(); i++) {
-                text += busArrivalList.get(i).getRtNm() + " 버스\n" +
-                        "첫번째 버스 " + busArrivalList.get(i).getArrmsg1() + "\n" +
-                        "두번째 버스 " + busArrivalList.get(i).getArrmsg2() + "\n";
-            }
-        }else{
-            System.out.println("busNumber exist");
-            for(int i=0; i<busArrivalList.size(); i++){
-                if(busNumber.equals(busArrivalList.get(i).getRtNm())){
-                    text += busArrivalList.get(STANDARD).getStNm() + " 정류소\n";
-                    text += busArrivalList.get(i).getRtNm() + " 버스\n" +
-                            "첫번째 버스 " + busArrivalList.get(i).getArrmsg1() + "\n" +
-                            "두번째 버스 " + busArrivalList.get(i).getArrmsg2() + "\n";
-                    break;
-                }else{
-                    if(i==busArrivalList.size()-1) {
-                        text += busNumber + " 버스 정보가 없습니다.\n";
+        int busArrivaListSize = busArrivalList.size();
+
+        //  ArrayList<ItemList> busArrival = busArrival.getMsgBody().getItemList();
+        ArrayList<ItemList> busArrival = null;
+
+        for (int i = 0; i < busArrivaListSize; i++) {
+            //busArrival 각각의 정보를 담는다
+            busArrival = busArrivalList.get(i);
+
+            //숫자 정보가 없다면
+            if (busNumber == null) {
+                text += busArrival.get(STANDARD).getStNm() + " 정류소\n";
+                for (int j = 0; j < busArrival.size(); j++) {
+                    text += busArrival.get(j).getRtNm() + " 버스\n" +
+                            "첫번째 버스 " + busArrival.get(j).getArrmsg1() + "\n" +
+                            "두번째 버스 " + busArrival.get(j).getArrmsg2() + "\n";
+                }
+            } else {
+                //숫자 정보가 있다면
+                for (int j = 0; j < busArrival.size(); j++) {
+                    if (busNumber.equals(busArrival.get(j).getRtNm())) {
+                        text += busArrival.get(STANDARD).getStNm() + " 정류소\n" +
+                                busArrival.get(j).getRtNm() + " 버스\n" +
+                                "첫번째 버스 " + busArrival.get(j).getArrmsg1() + "\n" +
+                                "두번째 버스 " + busArrival.get(j).getArrmsg2() + "\n";
+                        break;
+                    } else {
+                        if (j == busArrival.size() - 1) {
+                            text += busArrival.get(STANDARD).getStNm() + " 정류소\n" +
+                                    busNumber + "버스 정보가 없습니다.\n";
+                        }
                     }
                 }
+
             }
         }
         return text;
